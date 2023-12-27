@@ -1,0 +1,27 @@
+#!/bin/bash
+
+log_file="/var/log/DIT/$HOSTNAME.log"
+
+# File to store the last login time for the user
+last_login_file="/var/log/DIT/last_login_${USER}"
+
+# Check if there is a record of the last login
+if [ -f "$last_login_file" ]; then
+    last_login_time=$(cat "$last_login_file")
+    awk -v last_login="$last_login_time" '
+        BEGIN { FS = "\\[|\\]"; }
+        {
+            log_time_str = $2;
+            gsub(/[-:]/, " ", log_time_str);
+            log_time = mktime(log_time_str);
+	    if (log_time > last_login)
+                print $0;
+        }
+    ' "$log_file"
+else
+    echo "This is your first login or last login time is not recorded."
+fi
+
+# Update the last login time
+current_time=$(date +%s)
+echo $current_time > "$last_login_file"
