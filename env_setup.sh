@@ -57,7 +57,7 @@ for user in $(grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' ' '); do
 
 	# Create bash aliases
 	if [ ! -f "$user_home/.bash_aliases" ]; then
-	    echo "./Scripts/Login-Launch" >> "$user_home/.bash_aliases"
+	    echo "~/Scripts/Login-Launch" >> "$user_home/.bash_aliases"
         else
             echo "File already exists: .bash_aliases"
         fi
