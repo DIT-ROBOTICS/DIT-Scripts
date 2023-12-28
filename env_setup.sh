@@ -8,8 +8,8 @@ fi
 
 
 # Define the source files for symlinks
-src_dit_logger="/home/ditrobotics/DIT-S/DIT-Logger"
-src_login_launch="/home/ditrobotics/DIT-S/Login-Launch"
+src_dit_logger="/home/ditrobotics/DIT-Scripts/DIT-Logger"
+src_login_launch="/home/ditrobotics/DIT-Scripts/Login-Launch"
 
 # The current user's username
 current_user="ditrobotics"
