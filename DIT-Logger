@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Function to get the local connection IP
+get_local_ip() {
+    local_ip=$(who am i | awk '{print $NF}' | tr -d '()')
+    echo "$local_ip"
+}
+
+log_file="/var/log/DIT/$HOSTNAME.log"
+
+read -e -p "Enter a log message: " log_message
+
+# Getting details
+user_name=$(whoami)
+ip_address=$(get_local_ip)
+current_date_time=$(date '+%Y-%m-%d %H:%M:%S')
+
+# Creating the log entry
+log_entry="[$current_date_time] User: $user_name, IP: $ip_address, Message: { $log_message }"
+
+# Appending the log entry to the specified log file
+echo $log_entry >> $log_file
+
+echo "Log entry recorded."
+
