@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/ditrobotics/.config/conky/lean-conky-config/start-lcc.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=Conky System Monitoring
+Name=Conky System Monitoring
+Comment[en_US]=
+Comment=
