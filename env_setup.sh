@@ -71,3 +71,6 @@ su $current_user
 
 # Copy .bash_aliases to main user (ditrobotics)
 cp .bash_aliases ../
+
+exit
+# --- End of Non-root command ---
