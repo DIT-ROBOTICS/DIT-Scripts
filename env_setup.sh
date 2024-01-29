@@ -60,9 +60,8 @@ for user in $(grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' ' '); do
         echo "# Alias for DIT-Scripts" >> "$user_home/.bash_aliases"
 	    echo "~/Scripts/Login-Launch" >> "$user_home/.bash_aliases"
         echo "alias DIT-Logger=$user_home/Scripts/DIT-Logger" >> "$user_home/.bash_aliases"
-        else
-			echo "File already exists: .bash_aliases"
-        fi
+    else
+        echo "File already exists: .bash_aliases"
     fi
 done
 
