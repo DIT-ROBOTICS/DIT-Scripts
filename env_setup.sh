@@ -67,10 +67,8 @@ for user in $(grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' ' '); do
 done
 
 # --- Put your Non-root command below ---
-su $current_user
 
 # Copy .bash_aliases to main user (ditrobotics)
-cp .bash_aliases ../
+su - $current_user -c 'cp $HOME/DIT-Scripts/.bash_aliases $HOME/.bash_aliases'
 
-exit
 # --- End of Non-root command ---
