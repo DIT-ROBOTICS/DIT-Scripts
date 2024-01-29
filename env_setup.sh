@@ -61,7 +61,14 @@ for user in $(grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' ' '); do
 	    echo "~/Scripts/Login-Launch" >> "$user_home/.bash_aliases"
         echo "alias DIT-Logger=$user_home/Scripts/DIT-Logger" >> "$user_home/.bash_aliases"
         else
-            echo "File already exists: .bash_aliases"
+			echo "File already exists: .bash_aliases"
         fi
     fi
 done
+
+# --- Put your Non-root command below ---
+su $current_user
+
+# Copy .bash_aliases to main user (ditrobotics)
+cp .bash_aliases ../
+
