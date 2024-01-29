@@ -50,7 +50,8 @@ for user in $(grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' ' '); do
 
         # Change the owner of the Scripts directory to the user
         chown "$user":"$user" "$user_home/Scripts"
-
+    fi
+    
 	# Create user log files
 	touch "/var/log/DIT/last_login_$user"
 	chown "$user":"$user" "/var/log/DIT/last_login_$user"
