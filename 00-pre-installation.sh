@@ -25,7 +25,7 @@ progress_bar() {
 
 # Initialize step and total steps variables
 step=1
-total_steps=9 # Adjust based on the actual number of steps you have
+total_steps=10 # Adjust based on the actual number of steps you have
 
 upgrade_system() {
     echo -e "\033[32mUpdating and upgrading system...\033[0m"
@@ -128,11 +128,30 @@ setup_dit_logger() {
 
 flip_screen() {
     echo -e "\033[32mSetting up touch screen HID layout...\033[0m"
+	
+	read -p "Would you like to rotate touch screen? (y/n): " answer
 
-    echo 'ATTRS{name}=="wch.cn USB2IIC_CTP_CONTROL", ENV{LIBINPUT_CALIBRATION_MATRIX}="-1.000 0.000 1.000 0.000 -1.000 1.000"' >> /etc/udev/rules.d/99-calibration.rules
-	udevadm control --reload-rules
-	udevadm trigger
-	service udev restart
+	case $answer in
+	    [Yy]* )
+	        echo 'ATTRS{name}=="wch.cn USB2IIC_CTP_CONTROL", ENV{LIBINPUT_CALIBRATION_MATRIX}="-1.000 0.000 1.000 0.000 -1.000 1.000"' >> /etc/udev/rules.d/99-calibration.rules
+			udevadm control --reload-rules
+			udevadm trigger
+			service udev restart
+			;;
+	    * )
+	        echo "The screen layout will remain default."
+	        ;;
+	esac
+
+    sleep 1
+    progress_bar $step $total_steps
+    ((step++))
+}
+
+restore_firefox() {
+    echo -e "\033[32mRestoring firefox user preference...\033[0m"
+
+    cp -r .mozilla/ ~/snap/firefox/common/.mozilla/
 
     sleep 1
     progress_bar $step $total_steps
@@ -141,6 +160,7 @@ flip_screen() {
 
 # Add more steps as necessary...
 
+cd /home/ditrobotics/DIT-Scripts
 echo -e "\033[32mStarting pre-installation setup process...\033[0m"
 for ((i=step; i<=total_steps; i++)); do
     case $i in
@@ -153,6 +173,7 @@ for ((i=step; i<=total_steps; i++)); do
 		7) create_user;;
 		8) setup_dit_logger;;
 		9) flip_screen;;
+		10) restore_firefox;;
         *) echo -e "\033[31mInvalid step\033[0m";;
     esac
 done
