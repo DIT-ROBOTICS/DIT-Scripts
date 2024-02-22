@@ -151,7 +151,7 @@ flip_screen() {
 restore_firefox() {
     echo -e "\033[32mRestoring firefox user preference...\033[0m"
 
-    cp -r .mozilla/ ~/snap/firefox/common/.mozilla/
+    cp -r .mozilla/ /home/ditrobotics/snap/firefox/common/.mozilla/
 
     sleep 1
     progress_bar $step $total_steps
