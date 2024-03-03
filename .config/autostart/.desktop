@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=/home/ditrobotics/.config/conky/lean-conky-config/start-lcc.sh
+Exec=/home/ditrobotics/.config/conky/conky_entry.sh
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
