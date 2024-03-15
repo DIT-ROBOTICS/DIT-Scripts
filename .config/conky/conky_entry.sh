@@ -1,4 +1,7 @@
 #!/bin/bash
 
-/home/ditrobotics/.config/conky/lean-conky-config/start-lcc.sh
-conky -c /home/ditrobotics/.config/conky/conky-esp-config/.conky_esp32 &
+DIR="/home/ditrobotics/.config/conky"
+
+conky -c $DIR/conky-esp-config/.conky_esp32 &
+$DIR/lean-conky-config/start-lcc.sh
+$DIR/conky-esp-config/battery_watchdog.sh &
