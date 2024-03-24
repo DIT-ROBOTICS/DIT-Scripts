@@ -14,10 +14,10 @@ progress_bar() {
     local progress=$((current_step * 100 / total_steps))
     local filled=$((progress * 50 / 100)) # Assuming 50 characters wide bar
     local empty=$((50 - filled))
-	echo -ne "\r\033[32m["
+    echo -ne "\r\033[32m["
     printf "%-${filled}s" '' | tr ' ' '#'
     printf "%-${empty}s" '' | tr ' ' '-'
-	printf "] \033[33m%d%% (%d/%d)\033[0m \n" $progress $current_step $total_steps
+    printf "] \033[33m%d%% (%d/%d)\033[0m \n" $progress $current_step $total_steps
     if [ $current_step -eq $total_steps ]; then
         echo "" # Print a new line at the end of the progress
     fi
@@ -32,7 +32,7 @@ upgrade_system() {
 	
     apt update && sudo apt dist-upgrade -y
 
-	sleep 1
+    sleep 1
     progress_bar $step $total_steps
     ((step++))
 }
@@ -53,7 +53,8 @@ install_dependencies() {
 		tree \
 		iperf3 \
 		timeshift \
-		cheese
+		cheese \
+		ffmpeg
 
     sleep 1
     progress_bar $step $total_steps
@@ -73,12 +74,12 @@ remove_brltty() {
 install_docker() {
     echo -e "\033[32mInstalling Docker...\033[0m"
 
-	curl -fsSL https://get.docker.com -o get-docker.sh
+    curl -fsSL https://get.docker.com -o get-docker.sh
     sh ./get-docker.sh
     rm get-docker.sh
 
     groupadd docker
-    usermod -aG docker $USER
+    usermod -aG docker ditrobotics
     newgrp docker # optional
 
     sleep 1
@@ -89,7 +90,7 @@ install_docker() {
 setup_conky() {
     echo -e "\033[32mSetting up conky...\033[0m"
 
-    ./conky_setup.sh
+    ./10-conky_setup.sh
 
     sleep 1
     progress_bar $step $total_steps
@@ -99,7 +100,7 @@ setup_conky() {
 setup_motd_banner() {
     echo -e "\033[32mSetting up motd banner...\033[0m"
 
-    ./motd_setup.sh
+    ./10-motd_setup.sh
 
     sleep 1
     progress_bar $step $total_steps
@@ -109,7 +110,7 @@ setup_motd_banner() {
 create_user() {
     echo -e "\033[32mCreate each group user and set their permission...\033[0m"
 
-    ./user_setup.sh
+    ./10-user_setup.sh
 
     sleep 1
     progress_bar $step $total_steps
@@ -129,19 +130,19 @@ setup_dit_logger() {
 flip_screen() {
     echo -e "\033[32mSetting up touch screen HID layout...\033[0m"
 	
-	read -p "Would you like to rotate touch screen? (y/n): " answer
+    read -p "Would you like to rotate touch screen? (y/n): " answer
 
-	case $answer in
-	    [Yy]* )
-	        echo 'ATTRS{name}=="wch.cn USB2IIC_CTP_CONTROL", ENV{LIBINPUT_CALIBRATION_MATRIX}="-1.000 0.000 1.000 0.000 -1.000 1.000"' >> /etc/udev/rules.d/99-calibration.rules
-			udevadm control --reload-rules
-			udevadm trigger
-			service udev restart
-			;;
-	    * )
-	        echo "The screen layout will remain default."
-	        ;;
-	esac
+    case $answer in
+        [Yy]* )
+            echo 'ATTRS{name}=="wch.cn USB2IIC_CTP_CONTROL", ENV{LIBINPUT_CALIBRATION_MATRIX}="-1.000 0.000 1.000 0.000 -1.000 1.000"' >> /etc/udev/rules.d/99-calibration.rules
+            udevadm control --reload-rules
+            udevadm trigger
+            service udev restart
+	    ;;
+        * )
+            echo "The screen layout will remain default."
+	    ;;
+    esac
 
     sleep 1
     progress_bar $step $total_steps
@@ -151,7 +152,7 @@ flip_screen() {
 restore_firefox() {
     echo -e "\033[32mRestoring firefox user preference...\033[0m"
 
-    cp -r .mozilla/ /home/ditrobotics/snap/firefox/common/.mozilla/
+    find /home/ditrobotics/snap/firefox/common/.mozilla/firefox/ -type d -name "*.default" -exec cp -r /home/ditrobotics/DIT-Scripts/.mozilla/firefox/dit_config.default/* {} \;
 
     sleep 1
     progress_bar $step $total_steps
@@ -168,12 +169,12 @@ for ((i=step; i<=total_steps; i++)); do
         2) install_dependencies;;
         3) remove_brltty;;
         4) install_docker;;
-		5) setup_conky;;
-		6) setup_motd_banner;;
-		7) create_user;;
-		8) setup_dit_logger;;
-		9) flip_screen;;
-		10) restore_firefox;;
+        5) setup_conky;;
+        6) setup_motd_banner;;
+        7) create_user;;
+        8) setup_dit_logger;;
+        9) flip_screen;;
+       10) restore_firefox;;
         *) echo -e "\033[31mInvalid step\033[0m";;
     esac
 done
