@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html manifest="eurobot2024.appcache">
+<head>
+    <title>Eurobot 2024</title>
+    <style>
+        body, html {
+            height: 100%;	/* Full height */
+            margin: 0;		/* Remove default margin */
+            overflow: hidden;	/* Prevent scrolling */
+        }
+        body {
+            background-color: black; 	/* Set background color to black */
+            background-image: url('{{ url_for('static', filename='background.png') }}');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .button {
+            position: absolute;
+            transform: translate(-50%, -50%);		/* Center the buttons */
+        }
+        button {
+            width: 80px; 				/* Set the width of the button */
+            height: 80px; 				/* Set the height of the button */
+            border-radius: 20%; 			/* Make it round */
+            border: 2px solid #FFF; 			/* White border */
+            background-color: #DE272C; 			/* Button main color */
+            color: white; 				/* Text color */
+            font-size: 32px; 				/* Font size */
+        /*  box-shadow: 0 4px 8px rgba(0,0,0,0.1); 	/* Subtle shadow */
+            cursor: pointer; 				/* Cursor pointer */
+            outline: none; 				/* Remove outline */
+        }
+    	#button_0 {top: 10%; left: 20%;}
+        #button_1 {top: 50%; left: 20%;}
+        #button_2 {bottom: -7%; left: 20%;}
+        #button_3 {top: 10%; right: 12%;}
+        #button_4 {top: 50%; right: 12%;}
+        #button_5 {bottom: -7%; right: 12%;}
+    </style>
+</head>
+<body>
+    {% for i in range(6) %}
+        <form method="post" class="button" id="button_{{i}}">
+            <button type="submit" name="button" value="button_{{i}}">{{ state['button_' ~ i] }}</button>
+        </form>
+    {% endfor %}
+</body>
+</html>
+
