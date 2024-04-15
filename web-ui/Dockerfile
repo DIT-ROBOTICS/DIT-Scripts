@@ -5,7 +5,8 @@ WORKDIR /app
 COPY requirements.txt /app
 RUN pip install -r requirements.txt
 
-COPY . /app
+COPY entrypoint.sh /
+RUN chmod +x /entrypoint.sh
 
-CMD ["python", "app.py"]
-
+ENTRYPOINT ["/entrypoint.sh"]
+#CMD ["python", "app.py"]

@@ -1,0 +1,69 @@
+/* Custom Styles for Eurobot 2024 */
+@font-face {
+    font-family: 'Roboto';
+    src: url('/static/fonts/Roboto/Roboto-Regular.ttf') format('truetype'),
+         url('/static/fonts/Roboto/Roboto-Medium.ttf') format('truetype'),
+         url('/static/fonts/Roboto/Roboto-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body, html {
+    height: 100%;       /* Full height */
+    margin: 0;          /* Remove default margin */
+    overflow: hidden;   /* Prevent scrolling */
+}
+body {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    background-color: black;    /* Set background color to black */
+    background-image: url('background.png'); /* This will be resolved using Flask's url_for */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.on {
+    background-color: green;  /* Color representing "ON" state */
+}
+
+.off {
+    background-color: red;    /* Color representing "OFF" state */
+}
+
+.button {
+    position: absolute;
+    transform: translate(-50%, -50%); /* Center the buttons */
+} button {
+    width: 80px;                              /* Set the width of the button */
+    height: 80px;                             /* Set the height of the button */
+    border-radius: 20%;                       /* Make it round */
+    border: 2px solid #FFF;                   /* White border */
+    background-color: #DE272C;                /* Button main color */
+    color: white;                             /* Text color */
+    font-size: 32px;                          /* Font size */
+    cursor: pointer;                          /* Cursor pointer */
+    outline: none;                            /* Remove outline */
+}
+
+#button_0 {top: 10%; left: 20%;}
+#button_1 {top: 50%; left: 20%;}
+#button_2 {bottom: -7%; left: 20%;}
+#button_3 {top: 10%; right: 12%;}
+#button_4 {top: 50%; right: 12%;}
+#button_5 {bottom: -7%; right: 12%;}
+
+#number-display {
+    color: white;
+    font-size: 36px;
+    text-align: right;
+    position: absolute;
+    right: 5px;
+    top: 10px;
+    margin-right: 20px;
+}
+
