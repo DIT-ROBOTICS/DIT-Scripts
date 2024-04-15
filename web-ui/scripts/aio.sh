@@ -2,5 +2,5 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-$DIR/voltage.sh
-
+$DIR/voltage.sh &
+$DIR/check_devices.sh &

@@ -54,7 +54,8 @@ install_dependencies() {
 		iperf3 \
 		timeshift \
 		cheese \
-		ffmpeg
+		ffmpeg \
+		jq
 
     sleep 1
     progress_bar $step $total_steps

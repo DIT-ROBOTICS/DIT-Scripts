@@ -66,6 +66,15 @@ def get_group():
         return str(e), 500
     return data
 
+@app.route('/usb')
+def get_usb():
+    try:
+        with open('/data/usb.json', 'r') as file:
+            data = json.load(file)
+    except Exception as e:
+        return str(e), 500
+    return data
+
 @app.route('/eurobot2024.appcache')
 def cache_manifest():
     response = make_response(open('eurobot2024.appcache').read())

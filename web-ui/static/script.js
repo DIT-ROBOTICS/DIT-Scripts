@@ -31,3 +31,16 @@ function updateInfo() {
 
 setInterval(updateInfo, 1000);
 
+setInterval(function() {
+    fetch('/usb')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('stm_00').textContent = `${data.stm_00 === 0 ? '❎' : '✅'} STM0`;
+        document.getElementById('stm_01').textContent = `${data.stm_01 === 0 ? '❎' : '✅'} STM1`;
+        document.getElementById('lidar').textContent = `${data.lidar === 0 ? '❎' : '✅'} LIDAR`;
+        document.getElementById('esp32').textContent = `${data.esp32 === 0 ? '❎' : '✅'} ESP32`;
+        document.getElementById('vive_tracker').textContent = `${data.vive_tracker === 0 ? '❎' : '✅'} VIVE`;
+    })
+    .catch(error => console.error('Error loading the group data:', error));
+}, 5000);
+
