@@ -5,15 +5,23 @@
     	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+	<div id="info-box">
+        	<div id="main-info">SCX</div>
+        	<div id="vision-info"></div>
+        	<div id="navigation-info"></div>
+        	<div id="localization-info"></div>
+	</div>
+
 	{% for i in range(6) %}
     	<form method="post" class="button" id="button_{{i}}">
 		<button type="submit" name="button" value="button_{{i}}" class="{{ 'on' if state['button_' ~ i] else 'off' }}"></button>
 	</form>
 	{% endfor %}
-	<script src="{{ url_for('static', filename='script.js') }}"></script>
-	<div id="number-container">
+	<div id="score">DIT</div>
+	<div id="info-box-batt">
 		<span id="number-display"></span>
 	</div>
+	<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
 

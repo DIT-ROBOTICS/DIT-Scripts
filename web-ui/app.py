@@ -39,14 +39,32 @@ def index():
         state = load_state()
         return render_template('index.html', state=state)
 
+@app.route('/score')
+def get_score():
+    try:
+        with open('/data/score.cache', 'r') as file:
+            number = file.read().strip()
+    except Exception as e:
+        return str(e), 500
+    return number
+
 @app.route('/voltage', methods=['GET'])
-def get_number():
+def get_voltage():
     try:
         with open('/data/voltage.cache', 'r') as file:
             number = file.read().strip()
     except Exception as e:
         return str(e), 500
     return number
+
+@app.route('/group')
+def get_group():
+    try:
+        with open('/data/group.json', 'r') as file:
+            data = json.load(file)
+    except Exception as e:
+        return str(e), 500
+    return data
 
 @app.route('/eurobot2024.appcache')
 def cache_manifest():

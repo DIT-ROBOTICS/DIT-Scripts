@@ -8,6 +8,11 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Dune';
+    src: url('/static/fonts/Dune/Dune_Rise.ttf') format('truetype');
+}
+
 body, html {
     height: 100%;       /* Full height */
     margin: 0;          /* Remove default margin */
@@ -57,13 +62,44 @@ body {
 #button_4 {top: 50%; right: 12%;}
 #button_5 {bottom: -7%; right: 12%;}
 
+#score {
+    font-family: 'Dune', sans-serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 120px;
+    color: white;
+    text-shadow: 2px 2px 4px #000000;
+}
+
 #number-display {
     color: white;
     font-size: 36px;
     text-align: right;
+}
+
+#info-box {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    background-color: #DE272C;
+    padding: 10px;
+    border: 2px solid #FFFFFF;
+    width: 124px;
+    border-radius: 10px;
+    color: white;
+    font-size: 28px;
+}
+
+#info-box-batt {
     position: absolute;
     right: 5px;
     top: 10px;
-    margin-right: 20px;
+    background-color: #DE272C;
+    padding: 10px;
+    border: 2px solid #FFFFFF;
+    width: 120px;
+    border-radius: 10px;
+    color: white;
 }
-
