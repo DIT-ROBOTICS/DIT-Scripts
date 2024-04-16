@@ -15,7 +15,7 @@ setInterval(function() {
         document.getElementById('number-display').textContent = number + ' V';
     })
     .catch(error => console.error('Error fetching number:', error));
-}, 1000); // The function runs every 1000 milliseconds (1 second)
+}, 1000);
 
 function updateInfo() {
     fetch('/group')
@@ -42,5 +42,19 @@ setInterval(function() {
         document.getElementById('vive_tracker').textContent = `${data.vive_tracker === 0 ? '❎' : '✅'} VIVE`;
     })
     .catch(error => console.error('Error loading the group data:', error));
-}, 5000);
+}, 1000);
+
+
+document.getElementById('fullscreenButton').addEventListener('click', toggleFullScreen);
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      alert(`Cannot enter fullscreen mode: ${err.message}`);
+    });
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+}
 

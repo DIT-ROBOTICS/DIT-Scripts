@@ -54,12 +54,12 @@ body {
     outline: none;                            /* Remove outline */
 }
 
-#button_0 {top: 10%; left: 20%;}
-#button_1 {top: 50%; left: 20%;}
-#button_2 {bottom: -7%; left: 20%;}
-#button_3 {top: 10%; right: 12%;}
-#button_4 {top: 50%; right: 12%;}
-#button_5 {bottom: -7%; right: 12%;}
+#button_0 {top: 10%; left: 21%;}
+#button_1 {top: 50%; left: 21%;}
+#button_2 {top: 90%; left: 21%;}
+#button_3 {top: 10%; right: 12.5%;}
+#button_4 {top: 50%; right: 12.5%;}
+#button_5 {top: 90%; right: 12.5%;}
 
 #score {
     font-family: 'Dune', sans-serif;
@@ -69,7 +69,7 @@ body {
     transform: translate(-50%, -50%);
     font-size: 120px;
     color: white;
-    text-shadow: 2px 2px 4px #000000;
+    text-shadow: 10px 10px 3px #000000;
 }
 
 #number-display {
@@ -81,7 +81,7 @@ body {
 #info-box {
     position: absolute;
     top: 10px;
-    left: 0;
+    left: 5px;
     background-color: #DE272C;
     padding: 10px;
     border: 2px solid #FFFFFF;
@@ -113,4 +113,13 @@ body {
     width: 120px;
     border-radius: 10px;
     color: white;
+    font-size: 18px;
 }
+
+#fullscreenButton {
+    position: absolute;
+    left: 5px;
+    bottom: 10px;
+    background-color: #DE272C;
+}
+

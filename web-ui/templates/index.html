@@ -17,6 +17,7 @@
 		<button type="submit" name="button" value="button_{{i}}" class="{{ 'on' if state['button_' ~ i] else 'off' }}"></button>
 	</form>
 	{% endfor %}
+	
 	<div id="score">DIT</div>
 	<div id="info-box-batt">
 		<span id="number-display"></span>
@@ -28,6 +29,7 @@
 		<div id="esp32"></div>
 		<div id="vive_tracker"></div>
 	</div>
+	<button id="fullscreenButton">F11</button>
 	<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

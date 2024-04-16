@@ -24,6 +24,6 @@ function check_devices {
 while true
 do
     check_devices
-    sleep 5  # Check every 60 seconds
+    sleep 1
 done
 
