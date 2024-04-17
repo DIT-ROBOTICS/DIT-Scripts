@@ -13,4 +13,4 @@ while ! nc -z localhost 5000; do
   sleep 0.1
 done
 
-firefox http://localhost:5000 &
+firefox --kiosk http://localhost:5000 &
