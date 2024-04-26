@@ -9,6 +9,6 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
-      - ./data:/data
+      - /home/share/data:/data
     environment:
       - FLASK_ENV=development
