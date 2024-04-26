@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTPUT_JSON="/home/ditrobotics/DIT-Scripts/web-ui/data/usb.json"
+OUTPUT_JSON="/home/share/data/usb.json"
 
 # Initialize the JSON file to store device status
 echo '{"stm_00":0, "stm_01":0, "lidar":0, "esp32":0, "vive_tracker":0}' > $OUTPUT_JSON
