@@ -1,2 +1,3 @@
 web-ui/data/*
 !data/.gitkeep
+.arduino/Battery_watchdog/build/*
