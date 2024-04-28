@@ -1,3 +1,12 @@
+/******************************
+  Requirements: 
+    Adafruit_NeoPixel
+    Arduino_JSON
+    AsyncElegantOTA
+    AsyncTCP
+    ESP_Async_WebServer
+******************************/
+
 #include <Arduino.h>
 #include <ESPmDNS.h>
 #include <WiFi.h>
