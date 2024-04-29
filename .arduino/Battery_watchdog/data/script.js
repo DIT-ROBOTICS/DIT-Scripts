@@ -1,10 +1,9 @@
 // Get current sensor readings when the page loads
 window.addEventListener('load', getReadings);
 
-// Create Temperature Chart
 var chartT = new Highcharts.Chart({
   chart:{
-    renderTo:'chart-temperature'
+    renderTo:'chart-sensor'
   },
   series: [
     {
