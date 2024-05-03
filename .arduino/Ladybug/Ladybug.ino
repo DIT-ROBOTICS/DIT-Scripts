@@ -6,44 +6,109 @@
 
 /************************     OEM     ***************************/
 #define Hostname "ladybug-01" // mDNS Hostname
-#define RS 15                 // ReadySignal PINOUT (onboard LED)
+#define RS 2                  // ReadySignal PINOUT (onboard LED)
 
-int readySignal = 0;
+int readySignal = -1, color = -1;
 const char* ssid = "DIT_8C58";          // WiFi SSID
 const char* password = "ditrobotics";   // WiFi PWD
 /****************************************************************/
 
 AsyncWebServer server(80);
 
-const char* PARAM_INPUT_1 = "output";
+const char* PARAM_INPUT_1 = "color";
 const char* PARAM_INPUT_2 = "state";
 
 const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE HTML><html>
+<!DOCTYPE HTML>
+<html>
 <head>
   <title>DIT-Ladybug</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:,">
   <style>
-    html {font-family: Arial; display: inline-block; text-align: center;}
-    h2 {font-size: 3.0rem;}
-    p {font-size: 3.0rem;}
-    body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
-    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
-    .switch input {display: none}
-    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 6px}
-    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 3px}
-    input:checked+.slider {background-color: #DE272C}
-    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
+    html {
+      font-family: Arial;
+      text-align: center;
+    }
+    body {
+      max-width: 600px;
+      margin: 0 auto;
+      padding-bottom: 25px;
+    }
+    h2 {
+      font-size: 3.0rem;
+    }
+    p {
+      font-size: 3.0rem;
+    }
+    .button {
+      background-color: #DE272C;
+      color: white;
+      padding: 15px 32px;
+      font-size: 28px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 120px;
+      height: 68px;
+    }
+    .slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: blue;
+      border-radius: 6px;
+      transition: .4s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 52px;
+      width: 52px;
+      left: 8px;
+      bottom: 8px;
+      background-color: white;
+      border-radius: 3px;
+    }
+    input:checked + .slider {
+      background-color: yellow;
+    }
+    input:checked + .slider:before {
+      transform: translateX(52px);
+    }
   </style>
 </head>
 <body>
   <h2>Eurobot 2024</h2>
-  %BUTTONPLACEHOLDER%
-<script>function toggleCheckbox(element) {
+  <label class="switch">
+    <input type="checkbox" id="colorToggle" onchange="toggleColor(this)">
+    <span class="slider"></span>
+  </label>
+  <div> </div>
+  <button class="button" onclick="sendState(0)">RESET</button>
+  <button class="button" onclick="sendState(1)">READY</button>
+<script>
+
+function toggleColor(element) {
   var xhr = new XMLHttpRequest();
-  if(element.checked){ xhr.open("GET", "/updates?output="+element.id+"&state=1", true); }
-  else { xhr.open("GET", "/updates?output="+element.id+"&state=0", true); }
+  var colorValue = element.checked ? 1 : 0;
+  xhr.open("GET", "/updates?color=" + colorValue + "&state=" + state, true);
+  xhr.send();
+}
+
+function sendState(state) {
+  var xhr = new XMLHttpRequest();
+  var color = document.getElementById('colorToggle').checked ? 1 : 0;
+  xhr.open("GET", "/updates?color=" + color + "&state=" + state, true);
   xhr.send();
 }
 </script>
@@ -51,22 +116,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 </html>
 )rawliteral";
 
-// Replaces placeholder with button section in your web page
 String processor(const String& var) {
-  if (var == "BUTTONPLACEHOLDER") {
-    String buttons = "";
-    buttons += "<h4>ReadySignal</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
-    return buttons;
-  }
   return String();
-}
-
-String outputState(int output) {
-  if (digitalRead(output)) {
-    return "checked";
-  } else {
-    return "";
-  }
 }
 
 void initWiFi() {
@@ -98,18 +149,17 @@ void setup(void) {
     request->send_P(200, "text/html", index_html, processor);
   });
 
-  // Send a GET request to <ESP_IP>/updates?output=<inputMessage1>&state=<inputMessage2>
   server.on("/updates", HTTP_GET, [](AsyncWebServerRequest* request) {
-    String inputMessage1;
+    String inputMessage1, inputMessage2;
     if (request->hasParam(PARAM_INPUT_1)) {
       inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
-      if (inputMessage1.toInt() == 1) {
-        readySignal = inputMessage1.toInt();
-      }
+      inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
+      color = inputMessage1.toInt();
+      readySignal = inputMessage2.toInt();
     } else {
       inputMessage1 = "No message sent";
     }
-    request->send(200, "text/plain", "OK");
+    request->send(200, "text/plain", "DIT Robotics");
   });
 
   AsyncElegantOTA.begin(&server);  // Start ElegantOTA
@@ -117,16 +167,9 @@ void setup(void) {
 }
 
 void loop(void) {
-  
-  while(readySignal) {
-    /********** REPLACE YOUR START PROGRAM *********/
-    Serial.println(HIGH);
-    digitalWrite(RS, HIGH);
-    delay(500);
-    Serial.println(LOW);
-    digitalWrite(RS, LOW);
-    delay(500);
-    /***********************************************/
-  }
-
+  Serial.print("{color: ");
+  Serial.print(color);
+  Serial.print(", readySignal: ");
+  Serial.print(readySignal);
+  Serial.println("}");
 }

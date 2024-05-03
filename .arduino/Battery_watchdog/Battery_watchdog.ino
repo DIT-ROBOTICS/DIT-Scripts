@@ -20,6 +20,7 @@
 #define LED_PIN   D1
 #define LED_COUNT 29
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+int mode = 0;
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
@@ -41,10 +42,6 @@ AsyncEventSource events("/events");
 // Json Variable to Hold Sensor Readings
 JSONVar readings;
 
-// // Timer variables
-// unsigned long lastTime = 0;
-// unsigned long timerDelay = 3000;
-
 uint32_t Vbatt = 0;
 float Vbattf = 0.0;
 float offset = 0.65;
@@ -57,10 +54,13 @@ String getSensorReadings() {
   // 17.5V-[LOW]  20.5V-[FULL]
   if (Vbattf < 3) {
     readings["batteryStatus"] = "battery_disconnect";
+    mode = 2;
   } else if (Vbattf < 17.5) {
     readings["batteryStatus"] = "low_battery";
+    mode = 1;
   } else {
     readings["batteryStatus"] = "normal";
+    mode = 0;
   }
 
   String jsonString = JSON.stringify(readings);
@@ -76,9 +76,18 @@ void initSPIFFS() {
   }
 }
 
+void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("Disconnected from WiFi access point");
+  Serial.print("WiFi lost connection. Reason: ");
+  Serial.println(info.wifi_sta_disconnected.reason);
+  Serial.println("Trying to Reconnect");
+  WiFi.begin(ssid, password);
+}
+
 // Initialize WiFi
 void initWiFi() {
   WiFi.mode(WIFI_STA);
+  WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi ..");
   while (WiFi.status() != WL_CONNECTED) {
@@ -134,7 +143,7 @@ void setup() {
 
   strip.begin();            // INITIALIZE NeoPixel strip object (REQUIRED)
   strip.show();             // Turn OFF all pixels ASAP
-  strip.setBrightness(50);  // Set BRIGHTNESS to about 1/5 (max = 255)
+  strip.setBrightness(128); // Set BRIGHTNESS
 
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onTimer, true);
@@ -199,19 +208,25 @@ void Task2code(void *pvParameters) {
   Serial.println(xPortGetCoreID());
 
   for (;;) {
-    colorWipe(strip.Color(255, 0, 0), 50);         // Red
-    theaterChase(strip.Color(127, 127, 127), 50);  // White, half brightness
-    rainbow(1);                                    // Flowing rainbow cycle along the whole strip
-    theaterChaseRainbow(50);                       // Rainbow-enhanced theaterChase variant
+    switch (mode) 
+    {
+      case 2:
+        colorWipe(strip.Color(0, 0, 255), 50);
+        colorWipe(strip.Color(0, 0, 0), 50);
+        break;
+      case 1: 
+        colorWipe(strip.Color(255, 0, 0), 50);
+        colorWipe(strip.Color(0, 0, 0), 50);
+        break;
+      default:
+        rainbow(1);
+    }
+    // theaterChase(strip.Color(255, 0, 0), 50);
+    // theaterChaseRainbow(50);
   }
 }
 
-void loop() {
-  // if ((millis() - lastTime) > timerDelay) {
-  //   // depend on runtime
-  //   lastTime = millis();
-  // }
-}
+void loop() {}
 
 void colorWipe(uint32_t color, int wait) {
   for (int i = 0; i < strip.numPixels(); i++) {  // For each pixel in strip...
