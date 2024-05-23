@@ -5,11 +5,13 @@
     AsyncElegantOTA
     AsyncTCP
     ESP_Async_WebServer
+    WiFiManager
 ******************************/
 
 #include <Arduino.h>
 #include <ESPmDNS.h>
 #include <WiFi.h>
+#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 #include <AsyncTCP.h>
 #include <AsyncElegantOTA.h>
 #include <ESPAsyncWebServer.h>
@@ -22,16 +24,14 @@
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 int mode = 0;
 
+WiFiManager wifiManager;
+
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 
 volatile int interruptCounter;
 hw_timer_t *timer = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-
-// Replace with your network credentials
-const char *ssid = "DIT_8C58";
-const char *password = "ditrobotics";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -76,24 +76,9 @@ void initSPIFFS() {
   }
 }
 
-void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
-  Serial.println("Disconnected from WiFi access point");
-  Serial.print("WiFi lost connection. Reason: ");
-  Serial.println(info.wifi_sta_disconnected.reason);
-  Serial.println("Trying to Reconnect");
-  WiFi.begin(ssid, password);
-}
-
 // Initialize WiFi
 void initWiFi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi ..");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print('.');
-    delay(1000);
-  }
+  wifiManager.autoConnect("DIT-2024-12-ESP");
   if (!MDNS.begin("dit-2024-12-esp")) {
     Serial.println("Error starting mDNS");
     return;
