@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=DIT Launcher
+Exec=firefox http://localhost:5000
+Icon=/home/ditrobotics/DIT-Scripts/dit/DIT_logo.png
+Terminal=false
+Comment=Launch DIT script
+

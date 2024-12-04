@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=launch
+Exec=/bin/bash -c "/home/share/scripts/run.sh"
+Icon=/home/ditrobotics/DIT-Scripts/dit/rocket.png
+Terminal=true
+Comment=Launch DIT script
+

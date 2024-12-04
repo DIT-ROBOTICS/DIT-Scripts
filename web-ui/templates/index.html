@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html manifest="eurobot2024.appcache">
+<head>
+	<title>Eurobot 2024</title>
+    	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+	<div id="info-box">
+        	<div id="main-info">SCX</div>
+        	<div id="vision-info"></div>
+        	<div id="navigation-info"></div>
+        	<div id="localization-info"></div>
+	</div>
+
+	{% for i in range(6) %}
+    	<form method="post" class="button" id="button_{{i}}">
+		<button type="submit" name="button" value="button_{{i}}" class="{{ 'on' if state['button_' ~ i] else 'off' }}"></button>
+	</form>
+	{% endfor %}
+	
+	<div id="score">DIT</div>
+	<div id="info-box-batt">
+		<span id="number-display"></span>
+	</div>
+	<div id="info-box-usb">
+		<div id="stm_00">DIT</div>
+		<div id="stm_01"></div>
+		<div id="lidar"></div>
+		<div id="esp32"></div>
+		<div id="vive_tracker"></div>
+	</div>
+	<button id="fullscreenButton">F11</button>
+	<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+

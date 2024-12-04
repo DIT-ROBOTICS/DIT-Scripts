@@ -51,17 +51,24 @@ for user in $(grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' ' '); do
         # Change the owner of the Scripts directory to the user
         chown "$user":"$user" "$user_home/Scripts"
 
-	# Create user log files
-	touch "/var/log/DIT/last_login_$user"
-	chown "$user":"$user" "/var/log/DIT/last_login_$user"
+    	# Create user log files
+	    touch "/var/log/DIT/last_login_$user"
+	    chown "$user":"$user" "/var/log/DIT/last_login_$user"
 
-	# Create bash aliases
-	if [ ! -f "$user_home/.bash_aliases" ]; then
-        echo "# Alias for DIT-Scripts" >> "$user_home/.bash_aliases"
-	    echo "~/Scripts/Login-Launch" >> "$user_home/.bash_aliases"
-        echo "alias DIT-Logger=$user_home/Scripts/DIT-Logger" >> "$user_home/.bash_aliases"
+        # Create bash aliases
+        if [ ! -f "$user_home/.bash_aliases" ]; then
+            echo "# Alias for DIT-Scripts" >> "$user_home/.bash_aliases"
+            echo "~/Scripts/Login-Launch" >> "$user_home/.bash_aliases"
+            echo "alias DIT-Logger=$user_home/Scripts/DIT-Logger" >> "$user_home/.bash_aliases"
         else
             echo "File already exists: .bash_aliases"
         fi
     fi
 done
+
+# --- Put your Non-root command below ---
+
+# Copy .bash_aliases to main user (ditrobotics)
+su - $current_user -c 'cp $HOME/DIT-Scripts/.bash_aliases $HOME/.bash_aliases'
+
+# --- End of Non-root command ---
