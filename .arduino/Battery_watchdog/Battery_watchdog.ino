@@ -2,10 +2,11 @@
   Requirements: 
     Adafruit_NeoPixel
     Arduino_JSON
-    AsyncElegantOTA
+    AsyncElegantOTA-2.2.8
     AsyncTCP
     ESP_Async_WebServer
     WiFiManager
+  [ esp32 v2.0.17 ]
 ******************************/
 
 #include <Arduino.h>
