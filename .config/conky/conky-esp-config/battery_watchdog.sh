@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR="/home/ditrobotics/DIT-Scripts/.config/conky/conky-esp-config"
-pactl set-sink-volume @DEFAULT_SINK@ 60%
+pactl set-sink-volume @DEFAULT_SINK@ 95%
 cd $DIR
 sleep 1
 
