@@ -43,19 +43,29 @@ install_dependencies() {
     apt install -y \
 		vim \
 		curl \
-		net-tools \     # for network configuration
-		iw \            # for wireless network configuration
-		lm-sensors \    # for device temperature monitoring
-		conky \         # for system monitoring panel
+		net-tools \
+		iw \
+		lm-sensors \
+		conky \
 		tmux \
-		screen \        
+		screen \
 		htop \
 		tree \
-		iperf3 \        # for network performance testing
-		timeshift \     # for system snapshot and restore
-		cheese \        # for camera testing
-		ffmpeg \        # for audio and video processing (ex. boot-on sound)
-		jq              # for JSON parsing
+		iperf3 \
+		timeshift \
+		cheese \
+		ffmpeg \
+		jq
+
+		# net-tools     --- for network configuration
+		# iw            --- for wireless network configuration
+		# lm-sensors    --- for device temperature monitoring
+		# conky         --- for system monitoring panel
+		# iperf3        --- for network performance testing
+		# timeshift     --- for system snapshot and restore
+		# cheese        --- for camera testing
+		# ffmpeg        --- for audio and video processing (ex. boot-on sound)
+		# jq            --- for JSON parsing
 
     sleep 1
     progress_bar $step $total_steps
