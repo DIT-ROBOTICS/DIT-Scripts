@@ -43,26 +43,29 @@ install_dependencies() {
     apt install -y \
 		vim \
 		curl \
-		net-tools \
-		iw \
-		lm-sensors \
-		conky \
+		net-tools \     # for network configuration
+		iw \            # for wireless network configuration
+		lm-sensors \    # for device temperature monitoring
+		conky \         # for system monitoring panel
 		tmux \
-		screen \
+		screen \        
 		htop \
 		tree \
-		iperf3 \
-		timeshift \
-		cheese \
-		ffmpeg \
-		jq
+		iperf3 \        # for network performance testing
+		timeshift \     # for system snapshot and restore
+		cheese \        # for camera testing
+		ffmpeg \        # for audio and video processing (ex. boot-on sound)
+		jq              # for JSON parsing
 
     sleep 1
     progress_bar $step $total_steps
     ((step++))
 }
 
-remove_brltty() {
+# Fix for USB device detection issue
+# |  Reference: 
+# |  https://askubuntu.com/questions/1403705/dev-ttyusb0-not-present-in-ubuntu-22-04
+remove_brltty() {    
     echo -e "\033[32mRemoving brltty...\033[0m"
 
     apt remove -y brltty
@@ -72,6 +75,7 @@ remove_brltty() {
     ((step++))
 }
 
+# Install Docker Engine
 install_docker() {
     echo -e "\033[32mInstalling Docker...\033[0m"
 
@@ -88,6 +92,7 @@ install_docker() {
     ((step++))
 }
 
+# Setup Conky system monitoring panel
 setup_conky() {
     echo -e "\033[32mSetting up conky...\033[0m"
 
@@ -98,6 +103,7 @@ setup_conky() {
     ((step++))
 }
 
+# Setup Message of the MOTD banner
 setup_motd_banner() {
     echo -e "\033[32mSetting up motd banner...\033[0m"
 
@@ -108,6 +114,7 @@ setup_motd_banner() {
     ((step++))
 }
 
+# Setup DIT user group
 create_user() {
     echo -e "\033[32mCreate each group user and set their permission...\033[0m"
 
@@ -118,6 +125,7 @@ create_user() {
     ((step++))
 }
 
+# Setup DIT logger (System change information for each group)
 setup_dit_logger() {
     echo -e "\033[32mSetting up DIT logger...\033[0m"
 
@@ -128,14 +136,15 @@ setup_dit_logger() {
     ((step++))
 }
 
+# Setup touch screen orientation
 flip_screen() {
     echo -e "\033[32mSetting up touch screen HID layout...\033[0m"
 	
-    read -p "Would you like to rotate touch screen? (y/n): " answer
+    read -p "Would you like to rotate touch screen? (y/N): " answer
 
     case $answer in
         [Yy]* )
-            echo 'ATTRS{name}=="wch.cn USB2IIC_CTP_CONTROL", ENV{LIBINPUT_CALIBRATION_MATRIX}="-1.000 0.000 1.000 0.000 -1.000 1.000"' >> /etc/udev/rules.d/99-calibration.rules
+            echo 'ATTRS{name}=="wch.cn USB2IIC_CTP_CONTROL", ENV{LIBINPUT_CALIBRATION_MATRIX}="-1.000 0.000 1.000 0.000 -1.000 1.000"' >> /etc/udev/rules.d/80-calibration.rules
             udevadm control --reload-rules
             udevadm trigger
             service udev restart
@@ -150,6 +159,7 @@ flip_screen() {
     ((step++))
 }
 
+# Restore firefox user preference
 restore_firefox() {
     echo -e "\033[32mRestoring firefox user preference...\033[0m"
 

@@ -9,6 +9,7 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# Copy the motd message file
 echo "Copying motd config to $FilePATH"
 cp "$FileNAME" "$FilePATH"
 

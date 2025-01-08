@@ -6,6 +6,7 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# DIT software group list
 usernames=("main" "vision" "navigation" "localization")
 
 for username in "${usernames[@]}"
