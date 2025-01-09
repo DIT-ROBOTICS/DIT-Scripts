@@ -50,6 +50,27 @@ body:
       required: true
 
   - type: dropdown
+    id: change_type
+    attributes:
+      label: "Change Type"
+      description: "Select the type of change you are requesting."
+      options:
+        - "Addition"
+        - "Modification"
+        - "Removal"
+    validations:
+      required: true
+
+  - type: textarea
+    id: new_udev_rule
+    attributes:
+      label: "New Udev Rule"
+      description: "Provide the new udev rule to be added or changed."
+      placeholder: "e.g., ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"10c4\", ATTRS{idProduct}==\"ea60\", SYMLINK+=\"device_name\", MODE=\"0666\""
+    validations:
+      required: true
+
+  - type: dropdown
     id: tested
     attributes:
       label: "Has this been tested?"
