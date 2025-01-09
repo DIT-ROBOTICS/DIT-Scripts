@@ -6,7 +6,7 @@ cd $DIR
 sleep 1
 
 # Boot-up sound effect
-ffplay -nodisp -autoexit welcome_Paimon.mp3
+ffplay -nodisp -autoexit welcome.mp3
 
 while true; do
   voltage=$(./conky_esp32.sh)
