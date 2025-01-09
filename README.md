@@ -75,10 +75,10 @@ Refer to the [DigitalOcean Tutorial](https://www.digitalocean.com/community/tuto
 ### C. How to setup ssh_config? (recommended)
 Edit the `~/.ssh/config` file on your local machine and add the following content:
 ```bash
-Host			DIT-2025-10
-Hostname		dit-2025-10.local
+Host            DIT-2025-10
+Hostname        dit-2025-10.local
 User            main
-ForwardAgent	yes
+ForwardAgent    yes
 IdentityFile	~/.ssh/keys/DIT-2025_ed25519
 ```
 
