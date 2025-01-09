@@ -1,0 +1,99 @@
+name: "Udev Rules Change Request"
+description: "Template for requesting changes or updates to udev rules."
+title: "[Udev Rules Change] <Provide a brief description>"
+labels:
+  - udev
+  - change-request
+  - needs-review
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Instructions
+        Please fill out the sections below to provide all necessary details for your udev rules change request. Ensure you have provided sufficient information for reviewers to understand and evaluate your request.
+
+        ### Example Udev Rules
+        ```
+        ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="1835fcde3dd3ec11931b5383a1ca919a", SYMLINK+="stm_00", MODE="0666"
+        ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", ATTRS{serial}=="066DFF343047463043161846", SYMLINK+="stm_01", MODE="0666"
+        ACTION=="add", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0001", SYMLINK+="lidar", MODE="0666"
+        SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", SYMLINK+="esp32", MODE="0666"
+        ```
+
+        ### Explanation of Parameters
+        - **ACTION**: Specifies the action to trigger the rule, e.g., "add" for adding a device.
+        - **SUBSYSTEM**: Filters the type of device subsystem, e.g., "tty" for serial devices.
+        - **ATTRS{idVendor}**: Vendor ID of the device.
+        - **ATTRS{idProduct}**: Product ID of the device.
+        - **ATTRS{serial}**: Serial number of the device to uniquely identify it.
+        - **SYMLINK**: Creates a symbolic link to the device with the specified name.
+        - **MODE**: Sets the permissions of the device node, e.g., "0666" for read/write access for all users.
+
+  - type: input
+    id: requestor
+    attributes:
+      label: "Requesting Software Group"
+      description: "Your group requesting the change."
+      placeholder: "e.g., Localization"
+    validations:
+      required: true
+
+  - type: textarea
+    id: change_description
+    attributes:
+      label: "Change Description"
+      description: "Describe the purpose and context of the proposed udev rules change."
+      placeholder: "e.g., Update rules for new LIDAR device"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: change_type
+    attributes:
+      label: "Change Type"
+      description: "Select the type of change you are requesting."
+      options:
+        - "Addition"
+        - "Modification"
+        - "Removal"
+    validations:
+      required: true
+
+  - type: textarea
+    id: new_udev_rule
+    attributes:
+      label: "New Udev Rule"
+      description: "Provide the new udev rule to be added or changed."
+      placeholder: "e.g., ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"10c4\", ATTRS{idProduct}==\"ea60\", SYMLINK+=\"device_name\", MODE=\"0666\""
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tested
+    attributes:
+      label: "Has this been tested?"
+      description: "Confirm whether the change has been tested for functionality."
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: input
+    id: priority
+    attributes:
+      label: "Startup Priority"
+      description: "Specify if this needs to start before or after certain processes."
+      placeholder: "e.g., Not specified"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_notes
+    attributes:
+      label: "Additional Notes"
+      description: "Provide any additional context or information."
+      placeholder: "Optional"
+      render: false
