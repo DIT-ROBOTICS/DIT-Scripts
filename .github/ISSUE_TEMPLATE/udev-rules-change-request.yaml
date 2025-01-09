@@ -55,8 +55,8 @@ body:
       label: "Has this been tested?"
       description: "Confirm whether the change has been tested for functionality."
       options:
-        - Yes
-        - No
+        - "Yes"
+        - "No"
     validations:
       required: true
 
@@ -66,7 +66,7 @@ body:
       label: "Startup Priority"
       description: "Specify if this needs to start before or after certain processes."
       placeholder: "e.g., Not specified"
-      validations:
+    validations:
       required: true
 
   - type: textarea
