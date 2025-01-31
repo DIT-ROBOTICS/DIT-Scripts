@@ -1,10 +1,11 @@
 # ==================== ROS ==================== #
 # ==== Description: ROS environment setup ===== #
-# ============================================= #
+# =================== BEGIN =================== #
 
 source_ros_environment() {
     if [ "$ROS_DISTRO" = "humble" ]; then
         # Custom Alias
+        alias rosdep-check='rosdep install -i --from-path src --rosdistro humble -y'
         alias build='colcon build --symlink-install'
 
         # Source ROS environment
@@ -15,6 +16,8 @@ source_ros_environment() {
         latest_setup_bash=$(find $(pwd) -type f -name "setup.bash" -wholename "*/install/setup.bash" -printf "%T@ %p\n" | sort -nr | awk '{print $2}' | head -n 1)
         if [ -n "$latest_setup_bash" ]; then
             source $latest_setup_bash
+            # Source colcon environment
+            source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
             source /usr/share/colcon_cd/function/colcon_cd.sh
             export _colcon_cd_root="${latest_setup_bash%/install/setup.bash}"
         else
@@ -33,13 +36,15 @@ source_ros_environment() {
     fi
 }
 
-# ==================== ROS ==================== #
+# ==================== END ==================== #
+
+
 
 # ================= Functions ================= #
 # Note: If you want to use the custom function, #
 #        you need to uncomment the line below.  #
-# ============================================= #
+# =================== BEGIN =================== #
 
 source_ros_environment
 
-# ================= Functions ================= #
+# ==================== END ==================== #
