@@ -8,11 +8,11 @@ fi
 
 
 # Define the source files for symlinks
-src_dit_logger="/home/ditrobotics/DIT-Scripts/DIT-Logger"
-src_login_launch="/home/ditrobotics/DIT-Scripts/Login-Launch"
+src_dit_logger="/home/vision/DIT-Scripts/DIT-Logger"
+src_login_launch="/home/vision/DIT-Scripts/Login-Launch"
 
 # The current user's username
-current_user="ditrobotics"
+current_user="vision"
 
 src_DIT="/var/log/DIT"
 mkdir $src_DIT
@@ -69,6 +69,6 @@ done
 # --- Put your Non-root command below ---
 
 # Copy .bash_aliases to main user (ditrobotics)
-su - $current_user -c 'cp $HOME/DIT-Scripts/.bash_aliases $HOME/.bash_aliases'
+su - $current_user -c 'sudo -S cp $HOME/DIT-Scripts/.bash_aliases $HOME/.bash_aliases'
 
 # --- End of Non-root command ---

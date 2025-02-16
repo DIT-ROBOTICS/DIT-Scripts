@@ -173,7 +173,7 @@ flip_screen() {
 restore_firefox() {
     echo -e "\033[32mRestoring firefox user preference...\033[0m"
 
-    find /home/ditrobotics/snap/firefox/common/.mozilla/firefox/ -type d -name "*.default" -exec cp -r /home/ditrobotics/DIT-Scripts/.mozilla/firefox/dit_config.default/* {} \;
+    find /home/vision/snap/firefox/common/.mozilla/firefox/ -type d -name "*.default" -exec cp -r /home/vision/DIT-Scripts/.mozilla/firefox/dit_config.default/* {} \;
 
     sleep 1
     progress_bar $step $total_steps
