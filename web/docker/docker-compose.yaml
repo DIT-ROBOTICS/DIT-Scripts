@@ -1,6 +1,6 @@
 services:
   foxglove-bridge:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
       target: final
