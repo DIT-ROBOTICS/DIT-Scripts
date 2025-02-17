@@ -55,7 +55,8 @@ install_dependencies() {
 		timeshift \
 		cheese \
 		ffmpeg \
-		jq
+		jq \
+        ncdu
 
 		# net-tools     --- for network configuration
 		# iw            --- for wireless network configuration
@@ -66,6 +67,7 @@ install_dependencies() {
 		# cheese        --- for camera testing
 		# ffmpeg        --- for audio and video processing (ex. boot-on sound)
 		# jq            --- for JSON parsing
+        # ncdu          --- for disk usage analysis
 
     sleep 1
     progress_bar $step $total_steps

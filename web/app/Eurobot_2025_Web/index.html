@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROS2 Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .aspect-ratio-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .aspect-ratio-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform: scale(calc(min(100vw / 10, 100vh / 16)));
+            transform-origin: top left;
+            aspect-ratio: 10 / 16;
+            background-color: #222;
+            border: 2px solid #fff;
+            border-radius: 10px;
+        }
+
+        .dashboard {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="aspect-ratio-container">
+        <div class="aspect-ratio-content">
+            <div class="dashboard">
+                <!-- Header -->
+                <div class="header box">
+                    <div>
+                        <div class="status-light" style="background-color: green;"></div> Main
+                        <div class="status-light" style="background-color: yellow;"></div> Camera
+                        <div class="status-light" style="background-color: red;"></div> Navigation
+                        <div class="status-light" style="background-color: green;"></div> Localization
+                    </div>
+                    <div>Battery Status: <strong>19.7V</strong></div>
+                    <div>Debug Panel: Full</div>
+                </div>
+
+                <!-- Middle Map Area -->
+                <div class="map-area box">
+                    <div class="score">
+                        <h1>120</h1>
+                        <p>Estimated Score</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="footer box">
+                    <div class="plan-area">
+                        <div class="box">Strategy Preview Area</div>
+                        <div class="box">Mode Change Area</div>
+                        <div class="box">Plan Select Area</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
