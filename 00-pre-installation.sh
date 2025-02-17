@@ -56,7 +56,8 @@ install_dependencies() {
 		cheese \
 		ffmpeg \
 		jq \
-        ncdu
+        ncdu \
+        git-lfs
 
 		# net-tools     --- for network configuration
 		# iw            --- for wireless network configuration
@@ -68,6 +69,7 @@ install_dependencies() {
 		# ffmpeg        --- for audio and video processing (ex. boot-on sound)
 		# jq            --- for JSON parsing
         # ncdu          --- for disk usage analysis
+        # git-lfs       --- for git large file storage
 
     sleep 1
     progress_bar $step $total_steps

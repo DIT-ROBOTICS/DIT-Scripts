@@ -18,6 +18,7 @@ services:
 
     environment:
       - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=25
 
     volumes:
       - ../app:/home/user/app
