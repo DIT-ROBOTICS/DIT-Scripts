@@ -9,7 +9,7 @@ sleep 1
 ffplay -nodisp -autoexit welcome.mp3
 
 while true; do
-  voltage=$(./conky_esp32.sh)
+  # voltage=$(./conky_esp32.sh)
 
   if (( $(echo "$voltage < 17.5" | bc -l) )); then
     if ! pgrep -x "ffplay" > /dev/null; then

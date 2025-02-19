@@ -1,5 +1,5 @@
 conky.config = {
-    update_interval = 0.5,
+    update_interval = 1,
     total_run_times = 0,
     own_window = true,
     own_window_type = 'normal',
@@ -9,7 +9,7 @@ conky.config = {
     own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
     background = false,
     double_buffer = true,
-    alignment = 'top_right',
+    alignment = 'top_left',
     gap_x = 300,
     gap_y = 200,
     minimum_width = 200, minimum_height = 50,
@@ -24,5 +24,6 @@ conky.config = {
 };
 
 conky.text = [[
-${execi 1 /home/ditrobotics/.config/conky/conky-esp-config/conky_esp32.sh} V
+${exec awk '{getline v < "/sys/class/power_supply/BAT0/voltage_now"; printf "%.1f W\n", v * $1 / 1000000000000}' /sys/class/power_supply/BAT0/current_now}
 ]];
+-- ${execi 1 /home/ditrobotics/.config/conky/conky-esp-config/conky_esp32.sh} V
