@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=launch
-Exec=/bin/bash -c "/home/share/scripts/run.sh"
+Exec=/bin/bash -c "ffplay -nodisp -autoexit /home/ditrobotics/.config/conky/conky-esp-config/welcome_Paimon.mp3"
 Icon=/home/ditrobotics/DIT-Scripts/dit/rocket.png
 Terminal=true
 Comment=Launch DIT script
