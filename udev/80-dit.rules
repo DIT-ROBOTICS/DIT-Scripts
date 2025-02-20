@@ -1,9 +1,3 @@
-# DIT-2024-11
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="1835fcde3dd3ec11931b5383a1ca919a", SYMLINK+="stm_00", MODE="0666"
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", ATTRS{serial}=="066DFF343047463043161846", SYMLINK+="stm_01", MODE="0666"
-# DIT-2024-12
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="081c079d3ed3ec11a12b5383a1ca919a", SYMLINK+="stm_00", MODE="0666"
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", ATTRS{serial}=="066CFF545383564867213526", SYMLINK+="stm_01", MODE="0666"
-
-ACTION=="add", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0001", SYMLINK+="lidar", MODE="0666"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", SYMLINK+="esp32", MODE="0666"
+# DIT-2025-11
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="9a9cc62f2ad3ec1193555683a1ca919a", SYMLINK+="chassis", MODE="0666"
+ACTION=="add", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f450dedc3e77ed118311f6fafdf7b791", SYMLINK+="lidar", MODE="0666"
