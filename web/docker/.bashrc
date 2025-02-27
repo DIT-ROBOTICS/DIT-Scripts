@@ -10,6 +10,7 @@ source_ros_environment() {
 
         # Source ROS environment
         source /opt/ros/humble/setup.bash
+        export ROS_DOMAIN_ID=${HOSTNAME##*-}
 
         # Source workspace environment
         # latest_setup_bash: Find the latest setup.bash over user's root directory based on the last modified time
