@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Set ROS_DOMAIN_ID based on the hostname
-export ROS_DOMAIN_ID=${HOSTNAME##*-}
-echo "ROS_DOMAIN_ID set to: $ROS_DOMAIN_ID"
-
 if [ "$ROS_DISTRO" = 'noetic' ]; then
     source /opt/ros/noetic/setup.bash
     roslaunch foxglove_bridge foxglove_bridge.launch;
