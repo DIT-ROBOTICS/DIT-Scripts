@@ -19,10 +19,11 @@ services:
 
     environment:
       - DISPLAY=${DISPLAY}
-      - ROS_DOMAIN_ID=${HOSTNAME##*-}
+      # - ROS_DOMAIN_ID=10
 
     volumes:
       - ../app:/home/user/app
+      - ./entrypoint.sh:/entrypoint.sh
 
       # Mount local timezone into container. ( Readonly )
       # Reference: https://stackoverflow.com/questions/57607381/how-do-i-change-timezone-in-a-docker-container
@@ -35,19 +36,9 @@ services:
 
       # Mount Temporary Directory
       - ../config:/opt/ros/humble/share/teleop_twist_joy/config
-
-    command: >
-      /bin/bash -c "
-      if [ '${ROS_DISTRO}' = 'noetic' ]; then
-        roslaunch foxglove_bridge foxglove_bridge.launch;
-      elif [ '${ROS_DISTRO}' = 'humble' ]; then
-        ros2 launch foxglove_bridge foxglove_bridge_launch.xml &
-        ros2 launch teleop_twist_joy teleop-launch.py joy_config:='xbox' &
-        ros2 run image_tools cam2image --ros-args --log-level WARN -p video_device:=/dev/video0;
-      else
-        /bin/bash;
-      fi
-      "
+    
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    command: ["/bin/bash"]
   
   lichtblick:
     build:

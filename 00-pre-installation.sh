@@ -77,8 +77,10 @@ install_dependencies() {
 }
 
 # Fix for USB device detection issue
+# |
 # |  Reference: 
 # |  https://askubuntu.com/questions/1403705/dev-ttyusb0-not-present-in-ubuntu-22-04
+# |
 remove_brltty() {    
     echo -e "\033[32mRemoving brltty...\033[0m"
 
@@ -99,7 +101,7 @@ install_docker() {
 
     groupadd docker
     usermod -aG docker ditrobotics
-    newgrp docker # optional
+    # newgrp docker # optional
 
     sleep 1
     progress_bar $step $total_steps
@@ -150,11 +152,14 @@ setup_dit_logger() {
     ((step++))
 }
 
-# Setup touch screen orientation
+# Setup touch screen orientation:
+# |
+# | This is for Eurobot 2024 external usb touch screen, it isn't needed in general.
+# |
 flip_screen() {
     echo -e "\033[32mSetting up touch screen HID layout...\033[0m"
 	
-    read -p "Would you like to rotate touch screen? (y/N): " answer
+    read -p "Would you like to rotate external touch screen? (y/N): " answer
 
     case $answer in
         [Yy]* )
@@ -173,13 +178,18 @@ flip_screen() {
     ((step++))
 }
 
-# Restore firefox user preference
-restore_firefox() {
+# Restore user preference
+restore_user_preference() {
+
+    # Restore firefox configuration
     echo -e "\033[32mRestoring firefox user preference...\033[0m"
     # You need to open firefox first to create the folder
     read -p "Please open firefox first. Press [Enter] key to continue..."
-
     find /home/ditrobotics/snap/firefox/common/.mozilla/firefox/ -type d -name "*.default" -exec cp -r /home/ditrobotics/DIT-Scripts/.mozilla/firefox/dit_config.default/* {} \;
+
+    # Restore desktop configuration
+    echo -e "\033[32mRestoring desktop user preference...\033[0m"
+    cp -r /home/ditrobotics/DIT-Scripts/desktop/* /home/ditrobotics/Desktop/
 
     sleep 1
     progress_bar $step $total_steps
@@ -201,7 +211,7 @@ for ((i=step; i<=total_steps; i++)); do
         7) create_user;;
         8) setup_dit_logger;;
         9) flip_screen;;
-       10) restore_firefox;;
+       10) restore_user_preference;;
         *) echo -e "\033[31mInvalid step\033[0m";;
     esac
 done
@@ -218,7 +228,7 @@ IF ALL LOOKS GOOD, THEN CHECK THE FOLLOWING ITEM
 
 A) Do your first timeshift
 B) [ABANDONED] Use Clonezilla backup to external SSD
-C) Install Active Backup for Business (Synology NAS) and backup your system
+C) Install Active Backup for Business (Synology NAS) and backup to NAS
 "
 echo "$MOTD"
 
