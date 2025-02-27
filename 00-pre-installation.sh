@@ -46,7 +46,7 @@ install_dependencies() {
 		net-tools \
 		iw \
 		lm-sensors \
-		conky \
+		conky-all \
 		tmux \
 		screen \
 		htop \
@@ -62,7 +62,7 @@ install_dependencies() {
 		# net-tools     --- for network configuration
 		# iw            --- for wireless network configuration
 		# lm-sensors    --- for device temperature monitoring
-		# conky         --- for system monitoring panel
+		# conky-all     --- for system monitoring panel (update conky -> conky-all for Ubuntu 24.04)
 		# iperf3        --- for network performance testing
 		# timeshift     --- for system snapshot and restore
 		# cheese        --- for camera testing
@@ -176,6 +176,8 @@ flip_screen() {
 # Restore firefox user preference
 restore_firefox() {
     echo -e "\033[32mRestoring firefox user preference...\033[0m"
+    # You need to open firefox first to create the folder
+    read -p "Please open firefox first. Press [Enter] key to continue..."
 
     find /home/ditrobotics/snap/firefox/common/.mozilla/firefox/ -type d -name "*.default" -exec cp -r /home/ditrobotics/DIT-Scripts/.mozilla/firefox/dit_config.default/* {} \;
 
@@ -215,8 +217,8 @@ REBOOT YOUR SYSTEM!!!
 IF ALL LOOKS GOOD, THEN CHECK THE FOLLOWING ITEM
 
 A) Do your first timeshift
-B) Use Clonezilla backup to external SSD
-C) ...
+B) [ABANDONED] Use Clonezilla backup to external SSD
+C) Install Active Backup for Business (Synology NAS) and backup your system
 "
 echo "$MOTD"
 
