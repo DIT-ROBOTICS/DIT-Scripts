@@ -14,6 +14,25 @@
 
 This repository contains the environment deployment scripts for the DIT upper-level system, designed primarily for `Ubuntu Desktop 22.04 LTS`. It includes the installation of dependencies, deployment of the Docker environment, setup of the system status dashboard, configuration of the User Group permission framework for DIT's internal teams, and installation of `DIT-Logger`.
 
+## :rocket: Getting started
+
+Clone the repository:
+
+```sh
+$ git clone https://github.com/DIT-ROBOTICS/DIT-Scripts.git
+
+$ cd DIT-Scripts
+$ git submodule update --init --recursive
+```
+
+Pull large files with Git LFS:
+
+```sh
+$ cd web/lichtblick/
+$ git lfs install
+$ git lfs pull
+```
+
 ## Prerequisites for Running This Script
 
 Before running this script, ensure your Ubuntu system is properly configured and the necessary programs are installed.
