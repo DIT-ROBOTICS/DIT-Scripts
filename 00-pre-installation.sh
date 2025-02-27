@@ -25,7 +25,7 @@ progress_bar() {
 
 # Initialize step and total steps variables
 step=1
-total_steps=10 # Adjust based on the actual number of steps you have
+total_steps=11 # Adjust based on the actual number of steps you have
 
 upgrade_system() {
     echo -e "\033[32mUpdating and upgrading system...\033[0m"
@@ -196,6 +196,17 @@ restore_user_preference() {
     ((step++))
 }
 
+# Setup system environment
+setup_system_env() {
+    echo -e "\033[32mSetting up system environment...\033[0m"
+
+    ./20-env_setup.sh
+
+    sleep 1
+    progress_bar $step $total_steps
+    ((step++))
+}
+
 # Add more steps as necessary...
 
 cd /home/ditrobotics/DIT-Scripts
@@ -212,6 +223,7 @@ for ((i=step; i<=total_steps; i++)); do
         8) setup_dit_logger;;
         9) flip_screen;;
        10) restore_user_preference;;
+       11) setup_system_env;;
         *) echo -e "\033[31mInvalid step\033[0m";;
     esac
 done
