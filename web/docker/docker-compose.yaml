@@ -37,7 +37,7 @@ services:
       # Mount Temporary Directory
       - ../config:/opt/ros/humble/share/teleop_twist_joy/config
     
-    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
     command: ["/bin/bash"]
   
   lichtblick:
