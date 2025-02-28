@@ -1,0 +1,19 @@
+services:
+  voice_nav:
+    build: .
+    container_name: voice_nav
+    network_mode: "host"
+    privileged: true
+    stdin_open: true
+    tty: true
+    environment:
+      - DISPLAY=$DISPLAY
+      - PULSE_SERVER=unix:/run/user/1000/pulse/native
+      - PULSE_COOKIE=/run/user/1000/pulse/cookie
+      - ROS_DOMAIN_ID=25
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ~/.config/pulse:/root/.config/pulse
+      - /run/user/1000/pulse:/run/user/1000/pulse
+
+    # command: ["/bin/bash"]
