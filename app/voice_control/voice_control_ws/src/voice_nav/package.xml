@@ -5,9 +5,7 @@
   <maintainer email="your@email.com">Your Name</maintainer>
   <license>Apache-2.0</license>
 
-  <!-- 這裡應該是 ament_python，而不是 ament_cmake -->
   <buildtool_depend>ament_python</buildtool_depend>
-
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
