@@ -29,7 +29,7 @@ Pull large files with Git LFS:
 
 ```sh
 $ cd web/lichtblick/
-$ git lfs install
+$ git lfs install --local
 $ git lfs pull
 ```
 
