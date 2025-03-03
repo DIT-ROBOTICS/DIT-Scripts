@@ -191,6 +191,14 @@ restore_user_preference() {
     echo -e "\033[32mRestoring desktop user preference...\033[0m"
     cp -r /home/ditrobotics/DIT-Scripts/desktop/* /home/ditrobotics/Desktop/
 
+    # Restore plymouth theme configuration
+    echo -e "\033[32mRestoring plymouth theme preference...\033[0m"
+    cp -r /home/ditrobotics/DIT-Scripts/system/plymouth-themes/abstract_ring_alt /usr/share/plymouth/themes/
+    update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/abstract_ring_alt/abstract_ring_alt.plymouth 100
+    echo -e "\033[32mSelect the number for installed theme...\033[0m"
+    update-alternatives --config default.plymouth
+    update-initramfs -u
+
     sleep 1
     progress_bar $step $total_steps
     ((step++))
