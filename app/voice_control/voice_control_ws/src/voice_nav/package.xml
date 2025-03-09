@@ -1,8 +1,8 @@
 <package format="3">
   <name>voice_nav</name>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <description>Voice-controlled navigation</description>
-  <maintainer email="your@email.com">Your Name</maintainer>
+  <maintainer email="scx@gapp.nthu.edu.tw">SeanChangX</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_python</buildtool_depend>

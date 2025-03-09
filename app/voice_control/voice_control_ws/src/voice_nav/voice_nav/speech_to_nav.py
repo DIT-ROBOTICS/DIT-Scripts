@@ -10,11 +10,11 @@ class SpeechToNavNode(Node):
         super().__init__('speech_to_nav')
         self.publisher_ = self.create_publisher(PoseStamped, '/goal_pose', 10)
 
-        # 載入 VOSK 模型
-        self.model = Model("/root/vosk_model/vosk-model-small-en-us-0.15")
+        # Load VOSK model
+        self.model = Model("/home/ros/vosk_model/vosk-model-small-en-us-0.15")
         self.recognizer = KaldiRecognizer(self.model, 16000)
 
-        # 目標座標
+        # Goal Points
         self.goal_locations = {
             "point one": (2.3607, 0.8593, 0.0, 0.0, 0.7254, 0.6882),
             "point two": (1.0, 1.0, 0.0, 0.0, 0.0, 1.0),
@@ -25,8 +25,8 @@ class SpeechToNavNode(Node):
         self.start_listening()
 
     def start_listening(self):
-        """持續監聽語音"""
-        self.get_logger().info("開始語音識別...")
+        # Start listening
+        self.get_logger().info("Start listening...")
 
         audio = pyaudio.PyAudio()
         stream = audio.open(format=pyaudio.paInt16, channels=1, rate=16000,
@@ -41,11 +41,11 @@ class SpeechToNavNode(Node):
                 self.process_speech_command(text)
 
     def process_speech_command(self, text):
-        """處理語音指令"""
+        # Process speech command
         if not text:
             return
 
-        self.get_logger().info(f"識別結果: {text}")
+        self.get_logger().info(f"Recognization result: {text}")
 
         for location, (x, y, z, ox, oy, ow) in self.goal_locations.items():
             if location in text:
@@ -53,7 +53,7 @@ class SpeechToNavNode(Node):
                 return
 
     def send_nav_goal(self, x, y, z, ox, oy, ow):
-        """發送導航目標"""
+        # Send navigation goal
         goal = PoseStamped()
         goal.header.frame_id = "map"
         goal.header.stamp = self.get_clock().now().to_msg()
@@ -66,7 +66,7 @@ class SpeechToNavNode(Node):
         goal.pose.orientation.w = float(ow)
 
         self.publisher_.publish(goal)
-        self.get_logger().info(f"導航至 {x}, {y}")
+        self.get_logger().info(f"Navigation to {x}, {y}")
 
 def main():
     rclpy.init()

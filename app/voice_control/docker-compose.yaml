@@ -1,19 +1,52 @@
 services:
   voice_nav:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+        USERNAME: ros
+    image: scx/voice_nav:${ROS_DISTRO}
     container_name: voice_nav
-    network_mode: "host"
-    privileged: true
     stdin_open: true
     tty: true
-    environment:
-      - DISPLAY=$DISPLAY
-      - PULSE_SERVER=unix:/run/user/1000/pulse/native
-      - PULSE_COOKIE=/run/user/1000/pulse/cookie
-      - ROS_DOMAIN_ID=25
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - ~/.config/pulse:/root/.config/pulse
-      - /run/user/1000/pulse:/run/user/1000/pulse
+    privileged: true
+    network_mode: "host"
+    # restart: unless-stopped
 
-    # command: ["/bin/bash"]
+    working_dir: /home/ros
+
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+
+      # Environment variables for audio devices
+      - XDG_RUNTIME_DIR=/run/user/1000
+      - PULSE_SERVER=unix:/run/user/1000/pulse/native
+
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+      # Mount app workspace into container.
+      - ./voice_control_ws/:/home/ros/voice_control_ws/
+
+      # Mount local timezone into container.
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      # Mount X11 server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      
+      # Mount pipewire socket
+      - /run/user/1000/pipewire-0:/run/user/1000/pipewire-0
+      - /run/user/1000/pulse/native:/run/user/1000/pulse/native
+
+    devices:
+      # Mount audio devices
+      - /dev/snd
+    
+    group_add:
+      - audio
+
+    entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
+    command: ["/bin/bash"]
+  

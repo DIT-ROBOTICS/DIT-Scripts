@@ -4,12 +4,12 @@ package_name = 'voice_nav'
 
 setup(
     name=package_name,
-    version='0.0.1',
+    version='0.0.2',
     packages=[package_name],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='your_name',
-    maintainer_email='your@email.com',
+    maintainer='SeanChangX',
+    maintainer_email='scx@gapp.nthu.edu.tw',
     description='Voice-controlled navigation for ROS 2',
     license='Apache-2.0',
     tests_require=['pytest'],
