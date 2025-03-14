@@ -181,7 +181,7 @@ flip_screen() {
 # Restore user preference
 restore_user_preference() {
 
-    ./15-user_preference.sh
+    ./15-user_preference.sh all
 
     sleep 1
     progress_bar $step $total_steps
