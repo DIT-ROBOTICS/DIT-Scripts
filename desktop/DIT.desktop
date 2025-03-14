@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=DIT Launcher
-Exec=firefox http://localhost:5000
+Exec=firefox http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://192.168.50.11:8765
 Icon=/home/ditrobotics/DIT-Scripts/dit/DIT_logo.png
 Terminal=false
 Comment=Launch DIT script

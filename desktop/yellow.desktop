@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=Localization
-Exec=/bin/bash -c "/home/share/scripts/localization.run"
+Name=Yellow
+Exec=/bin/bash -c "/home/share/scripts/yellow.run"
 Icon=utilities-terminal
 Terminal=true
 Comment=Launch DIT script
