@@ -181,23 +181,7 @@ flip_screen() {
 # Restore user preference
 restore_user_preference() {
 
-    # Restore firefox configuration
-    echo -e "\033[32mRestoring firefox user preference...\033[0m"
-    # You need to open firefox first to create the folder
-    read -p "Please open firefox first. Press [Enter] key to continue..."
-    find /home/ditrobotics/snap/firefox/common/.mozilla/firefox/ -type d -name "*.default" -exec cp -r /home/ditrobotics/DIT-Scripts/.mozilla/firefox/dit_config.default/* {} \;
-
-    # Restore desktop configuration
-    echo -e "\033[32mRestoring desktop user preference...\033[0m"
-    cp -r /home/ditrobotics/DIT-Scripts/desktop/* /home/ditrobotics/Desktop/
-
-    # Restore plymouth theme configuration
-    echo -e "\033[32mRestoring plymouth theme preference...\033[0m"
-    cp -r /home/ditrobotics/DIT-Scripts/system/plymouth-themes/abstract_ring_alt /usr/share/plymouth/themes/
-    update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/abstract_ring_alt/abstract_ring_alt.plymouth 100
-    echo -e "\033[32mSelect the number for installed theme...\033[0m"
-    update-alternatives --config default.plymouth
-    update-initramfs -u
+    ./15-user_preference.sh
 
     sleep 1
     progress_bar $step $total_steps
