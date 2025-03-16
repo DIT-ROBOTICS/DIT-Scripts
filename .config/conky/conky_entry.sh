@@ -10,7 +10,7 @@ sleep 3
 pactl set-sink-volume @DEFAULT_SINK@ 95%
 # Boot-up sound effect
 sleep 1
-ffplay -nodisp -autoexit welcome.mp3
+ffplay -nodisp -autoexit /home/ditrobotics/DIT-Scripts/.config/conky/conky-esp-config/welcome.mp3
 # ========================================
 # ===== PUT SOUND EFFECT MODULE HERE =====
 
