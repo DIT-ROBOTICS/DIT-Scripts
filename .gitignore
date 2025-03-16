@@ -1,4 +1,14 @@
+# Ignore the vscode directory
+.vscode/*
+
+# Ignore the build directory
+**/build/
+**/install/
+**/log/
+
+# Ignore python cache files
+**/__pycache__/
+
+# Other pecific files or directories
 web-ui/data/*
 !data/.gitkeep
-.arduino/Battery_watchdog/build/*
-.vscode/*

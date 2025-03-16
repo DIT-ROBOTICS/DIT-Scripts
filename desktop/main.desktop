@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Main
+Exec=/bin/bash -c "/home/share/scripts/main.run"
+Icon=utilities-terminal
+Terminal=true
+Comment=Launch DIT script
+
