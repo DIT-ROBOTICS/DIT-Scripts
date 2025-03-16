@@ -8,6 +8,8 @@ tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S docker compose -p communicatio
 tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S docker compose -p communication -f /home/localization/Eurobot-2025-Localization/docker/testBot/OdomComm/docker/blue-compose.yml down" C-m
 # Remove navigation
 tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S docker compose -p navigation-run -f /home/navigation/Eurobot-2025-machine-ws/src/Eurobot-2025-Navigation2-envs/Navigation2-humble-deploy/docker-compose.yaml down" C-m
+# Remove main
+tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S docker compose -p main-run -f /home/main/Eurobot-2025-Main-ws/docker/docker-compose-lin.yml down" C-m
 
 # Attach to the session
 tmux attach-session -d
