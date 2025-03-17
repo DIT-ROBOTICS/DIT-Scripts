@@ -1,4 +1,11 @@
-float32 battery_percentage
+int32   battery_percentage
+bool    charging
 float32 cpu_usage
 float32 cpu_temperature
 float32 ram_usage
+int32   wifi_signal_strength
+bool    wifi_connected
+string  wifi_ssid
+int32   disk_usage
+string  robot_ip
+float32 uptime

@@ -43,7 +43,9 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     python3-pip \
-    bash-completion
+    bash-completion \
+    wireless-tools \
+    ros-humble-rmw-cyclonedds-cpp
 
 RUN apt-get update && apt-get dist-upgrade -y \
     && apt-get autoremove -y \
@@ -69,7 +71,7 @@ COPY .bashrc /home/$USERNAME/.bashrc.conf
 RUN cat /home/$USERNAME/.bashrc.conf >> /home/$USERNAME/.bashrc
 
 # Set up python environment
-RUN pip install --upgrade pip
+# RUN pip install --upgrade pip
 # RUN pip install --no-cache-dir
 
 CMD ["/bin/bash"]
