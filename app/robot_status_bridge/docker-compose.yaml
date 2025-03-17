@@ -7,8 +7,8 @@ services:
       args:
         ROS_DISTRO: ${ROS_DISTRO}
         USERNAME: ros
-    image: scx/robot_status_bridge:${ROS_DISTRO}
-    container_name: robot_status_bridge
+    image: scx/robot-status-bridge:${ROS_DISTRO}
+    container_name: robot-status-bridge
     stdin_open: true
     tty: true
     privileged: true
@@ -20,12 +20,13 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
     volumes:
       - ./entrypoint.sh:/entrypoint.sh
       # Mount app resources into container.
-      - ./robot_status_br/:/home/ros/robot_status_br/         # ros2 workspace
-      - /sys/class/power_supply:/sys/class/power_supply:ro    # battery status
+      - ./robot_status_br/:/home/ros/robot_status_br/   # ros2 workspace
+      - /sys/class:/sys/class:ro                        # for system status monitoring
 
       # Mount local timezone into container.
       - /etc/timezone:/etc/timezone:ro

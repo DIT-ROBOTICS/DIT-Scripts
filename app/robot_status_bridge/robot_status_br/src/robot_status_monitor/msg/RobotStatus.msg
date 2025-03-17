@@ -1,0 +1,4 @@
+float32 battery_percentage
+float32 cpu_usage
+float32 cpu_temperature
+float32 ram_usage

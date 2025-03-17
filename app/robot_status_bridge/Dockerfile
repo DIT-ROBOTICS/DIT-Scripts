@@ -43,8 +43,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     python3-pip \
-    bash-completion \
-    lm-sensors
+    bash-completion
 
 RUN apt-get update && apt-get dist-upgrade -y \
     && apt-get autoremove -y \
