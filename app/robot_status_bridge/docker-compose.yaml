@@ -1,5 +1,5 @@
 services:
-  voice_nav:
+  robot-status-bridge:
     build: 
       context: .
       dockerfile: Dockerfile
