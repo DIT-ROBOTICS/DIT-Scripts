@@ -1,0 +1,37 @@
+services:
+  esp-daemon:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+        USERNAME: ros
+    image: scx/esp-daemon:${ROS_DISTRO}
+    container_name: esp-daemon
+    stdin_open: true
+    tty: true
+    privileged: true
+    network_mode: "host"
+    restart: unless-stopped
+
+    working_dir: /home/ros
+
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+      # Mount app resources into container.
+      - ./esp-daemon/:/home/ros/esp-daemon/   # ros2 workspace
+
+      # Mount local timezone into container.
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      # Mount X11 server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+    entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
+    command: ["/bin/bash"]
