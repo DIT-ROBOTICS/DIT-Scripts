@@ -1,0 +1,38 @@
+services:
+  voice_nav:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+        USERNAME: ros
+    image: scx/robot-status-bridge:${ROS_DISTRO}
+    container_name: robot-status-bridge
+    stdin_open: true
+    tty: true
+    privileged: true
+    network_mode: "host"
+    restart: unless-stopped
+
+    working_dir: /home/ros
+
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+      # Mount app resources into container.
+      - ./robot_status_br/:/home/ros/robot_status_br/   # ros2 workspace
+      - /sys/class:/sys/class:ro                        # for system status monitoring
+
+      # Mount local timezone into container.
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      # Mount X11 server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+    entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
+    command: ["/bin/bash"]
