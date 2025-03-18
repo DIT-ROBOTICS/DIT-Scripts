@@ -45,7 +45,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     bash-completion \
     wireless-tools \
-    ros-humble-rmw-cyclonedds-cpp
+    ros-humble-rmw-cyclonedds-cpp \
+    ros-humble-foxglove-bridge
 
 RUN apt-get update && apt-get dist-upgrade -y \
     && apt-get autoremove -y \
