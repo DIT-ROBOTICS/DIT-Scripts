@@ -11,47 +11,49 @@
 class RobotStatusPublisher : public rclcpp::Node {
 public:
     RobotStatusPublisher() : Node("robot_status_node") {
-        std::string hostname = get_valid_hostname();
+std::string hostname = get_valid_hostname();
+
+        // std::string hostname = get_valid_hostname();
 
         // Set the refresh rate for each topic (seconds)
         topic_refresh_rates_ = {
-            {"/" + hostname + "/robot_status/battery", 5.0},        
-            {"/" + hostname + "/robot_status/charging", 10.0},   
-            {"/" + hostname + "/robot_status/cpu", 1.0},            
-            {"/" + hostname + "/robot_status/cpu_temp", 1.0},           
-            {"/" + hostname + "/robot_status/ram", 1.0},            
-            {"/" + hostname + "/robot_status/wifi_signal", 1.0},   
-            {"/" + hostname + "/robot_status/wifi_connected", 5.0},
-            {"/" + hostname + "/robot_status/wifi_ssid", 5.0},
-            {"/" + hostname + "/robot_status/disk", 60.0},
-            {"/" + hostname + "/robot_status/robot_ip", 5.0},
-            {"/" + hostname + "/robot_status/uptime", 30.0}        
+            {"/robot_status/battery", 5.0},        
+            {"/robot_status/charging", 10.0},   
+            {"/robot_status/cpu", 1.0},            
+            {"/robot_status/cpu_temp", 1.0},           
+            {"/robot_status/ram", 1.0},            
+            {"/robot_status/wifi_signal", 1.0},   
+            {"/robot_status/wifi_connected", 5.0},
+            {"/robot_status/wifi_ssid", 5.0},
+            {"/robot_status/disk", 60.0},
+            {"/robot_status/robot_ip", 5.0},
+            {"/robot_status/uptime", 30.0}        
         };
 
         // Set the shell commands for each topic
         status_commands_ = {
             // Get battery percentage from BAT0 or BAT1
-            {"/" + hostname + "/robot_status/battery", {"std_msgs::msg::Int32", "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || cat /sys/class/power_supply/BAT1/capacity 2>/dev/null" }},
+            {"/robot_status/battery", {"std_msgs::msg::Int32", "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || cat /sys/class/power_supply/BAT1/capacity 2>/dev/null" }},
             // Check if BAT0 or BAT1 is charging
-            {"/" + hostname + "/robot_status/charging", {"std_msgs::msg::Bool", "cat /sys/class/power_supply/BAT0/status 2>/dev/null | grep -q 'Charging' || cat /sys/class/power_supply/BAT1/status 2>/dev/null | grep -q 'Charging' && echo 1 || echo 0" }},
+            {"/robot_status/charging", {"std_msgs::msg::Bool", "cat /sys/class/power_supply/BAT0/status 2>/dev/null | grep -q 'Charging' || cat /sys/class/power_supply/BAT1/status 2>/dev/null | grep -q 'Charging' && echo 1 || echo 0" }},
             // Get CPU usage percentage
-            {"/" + hostname + "/robot_status/cpu", {"std_msgs::msg::Float32", "top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'" }},
+            {"/robot_status/cpu", {"std_msgs::msg::Float32", "top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'" }},
             // Get CPU temperature in Celsius
-            {"/" + hostname + "/robot_status/cpu_temp", {"std_msgs::msg::Float32", "cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{print $1/1000}'" }},
+            {"/robot_status/cpu_temp", {"std_msgs::msg::Float32", "cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{print $1/1000}'" }},
             // Get RAM usage percentage
-            {"/" + hostname + "/robot_status/ram", {"std_msgs::msg::Float32", "free | grep Mem | awk '{print ($3/$2) * 100.0}'" }},
+            {"/robot_status/ram", {"std_msgs::msg::Float32", "free | grep Mem | awk '{print ($3/$2) * 100.0}'" }},
             // Get Wi-Fi signal strength
-            {"/" + hostname + "/robot_status/wifi_signal", {"std_msgs::msg::Int32", "awk 'NR==3 {print int($3 * 100 / 70)}' /proc/net/wireless" }},
+            {"/robot_status/wifi_signal", {"std_msgs::msg::Int32", "awk 'NR==3 {print int($3 * 100 / 70)}' /proc/net/wireless" }},
             // Check if Wi-Fi is connected
-            {"/" + hostname + "/robot_status/wifi_connected", {"std_msgs::msg::Bool", "cat /sys/class/net/wlp2s0/operstate 2>/dev/null | grep -q 'up' && echo 1 || echo 0" }},
+            {"/robot_status/wifi_connected", {"std_msgs::msg::Bool", "cat /sys/class/net/wlp2s0/operstate 2>/dev/null | grep -q 'up' && echo 1 || echo 0" }},
             // Get Wi-Fi SSID
-            {"/" + hostname + "/robot_status/wifi_ssid", {"std_msgs::msg::String", "iwgetid -r 2>/dev/null" }},
+            {"/robot_status/wifi_ssid", {"std_msgs::msg::String", "iwgetid -r 2>/dev/null" }},
             // Get disk usage percentage
-            {"/" + hostname + "/robot_status/disk", {"std_msgs::msg::Int32", "df --output=pcent / | tail -1 | tr -d '%'" }},
+            {"/robot_status/disk", {"std_msgs::msg::Int32", "df --output=pcent / | tail -1 | tr -d '%'" }},
             // Get robot IP address
-            {"/" + hostname + "/robot_status/robot_ip", {"std_msgs::msg::String", "hostname -I | awk '{print $1}'" }},
+            {"/robot_status/robot_ip", {"std_msgs::msg::String", "hostname -I | awk '{print $1}'" }},
             // Get system uptime in hours
-            {"/" + hostname + "/robot_status/uptime", {"std_msgs::msg::Float32", "awk '{print $1/3600}' /proc/uptime" }},
+            {"/robot_status/uptime", {"std_msgs::msg::Float32", "awk '{print $1/3600}' /proc/uptime" }},
         };
 
         // Create publishers and timers based on the data type
