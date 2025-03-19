@@ -21,11 +21,14 @@ services:
       - DISPLAY=${DISPLAY}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+    
+    devices:
+      - "/dev/ttyACM0:/dev/ttyACM0"
 
     volumes:
       - ./entrypoint.sh:/entrypoint.sh
       # Mount app resources into container.
-      - ./esp-daemon/:/home/ros/esp-daemon/   # ros2 workspace
+      - ./esp_daemon/:/home/ros/esp_daemon/   # ros2 workspace
 
       # Mount local timezone into container.
       - /etc/timezone:/etc/timezone:ro

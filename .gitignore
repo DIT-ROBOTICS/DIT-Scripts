@@ -1,5 +1,6 @@
 # Ignore the vscode directory
 .vscode/*
+**/.vscode/*
 
 # Ignore the build directory
 **/build/

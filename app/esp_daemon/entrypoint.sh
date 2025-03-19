@@ -2,7 +2,7 @@
 
 WS_DIR=~/esp_daemon
 
-cd WS_DIR
+cd $WS_DIR
 # . /opt/ros/humble/setup.sh && colcon build --symlink-install
 
 source $WS_DIR/install/setup.bash
