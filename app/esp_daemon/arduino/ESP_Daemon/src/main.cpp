@@ -31,6 +31,7 @@
 // Standard ROS2 message types
 #include <std_msgs/msg/int32.h>
 #include <std_msgs/msg/float32.h>
+#include <std_msgs/msg/bool.h>
 
 // Ensure that the transport layer being used is Arduino Serial.
 // If it's not, compilation is stopped and error is printed.
@@ -44,6 +45,12 @@ std_msgs__msg__Int32 msg;
 
 rcl_publisher_t float_publisher;
 std_msgs__msg__Float32 float_msg;
+
+rcl_subscription_t bool_subscriber;
+std_msgs__msg__Bool bool_msg;
+
+rcl_subscription_t int_subscriber;
+std_msgs__msg__Int32 int_msg;
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -63,18 +70,24 @@ void error_loop() {
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
 
 float Vbattf = 0.0;
+volatile int mode = 0;
 // This is the function that will be called every time the timer expires
 void timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
-    // Publish integer message
     RCSOFTCHECK(rcl_publish(&publisher, &msg, NULL));
-    // Publish float message
-    float_msg.data = Vbattf;
-    RCSOFTCHECK(rcl_publish(&float_publisher, &float_msg, NULL));
+    // Publish integer message
+    if (rcl_publish(&publisher, &msg, NULL) == RCL_RET_OK) {
+      RCSOFTCHECK(rcl_publish(&float_publisher, &float_msg, NULL));
+    }
     msg.data++;
     float_msg.data = Vbattf;
   }
+}
+
+void sima_callback(const void * msgin) {
+  const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
+  mode = msg->data;
 }
 
 void initROS(void) {
@@ -97,17 +110,17 @@ void initROS(void) {
     &publisher,
     &node,
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-    "micro_ros_platformio_node_publisher"));
+    "esp32_counter"));
 
   // Initialize a ROS publisher for Float32 messages
   RCCHECK(rclc_publisher_init_default(
     &float_publisher,
     &node,
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
-    "battery_voltage"));
+    "/robot_status/battery_voltage"));
 
   // Initialize a timer with a period of 1 second which calls the function timer_callback() every time it expires
-  const unsigned int timer_timeout = 10;
+  const unsigned int timer_timeout = 100;
   RCCHECK(rclc_timer_init_default(
     &timer,
     &support,
@@ -115,9 +128,29 @@ void initROS(void) {
     timer_callback));
 
   // Initialize an executor that will manage the execution of all the ROS entities (publishers, subscribers, services, timers)
-  RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
+  RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator));
   // Add our timer to the executor
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
+
+  // // Initialize a ROS subscriber for Bool messages
+  // RCCHECK(rclc_subscription_init_default(
+  //   &bool_subscriber,
+  //   &node,
+  //   ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Bool),
+  //   "/sima/start"));
+
+  // // Add the subscriber to the executor
+  // RCCHECK(rclc_executor_add_subscription(&executor, &bool_subscriber, &bool_msg, &sima_callback, ON_NEW_DATA));
+
+  // Initialize a ROS subscriber for Int32 messages
+  RCCHECK(rclc_subscription_init_default(
+    &int_subscriber,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+    "/sima/start"));
+
+  // Add the subscriber to the executor
+  RCCHECK(rclc_executor_add_subscription(&executor, &int_subscriber, &int_msg, &sima_callback, ON_NEW_DATA));
 
   // Initialize our message data to 0
   msg.data = 0;
@@ -129,7 +162,7 @@ void initROS(void) {
 #define LED_PIN   D1
 #define LED_COUNT 30
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-int mode = 0;
+// int mode = 0;
 
 WiFiManager wifiManager;
 
@@ -161,13 +194,13 @@ String getSensorReadings() {
   // 17.5V-[LOW]  20.5V-[FULL]
   if (Vbattf < 3) {
     readings["batteryStatus"] = "battery_disconnect";
-    mode = 2;
+    // mode = 2;
   } else if (Vbattf < 17.5) {
     readings["batteryStatus"] = "low_battery";
-    mode = 1;
+    // mode = 1;
   } else {
     readings["batteryStatus"] = "normal";
-    mode = 0;
+    // mode = 0;
   }
 
   String jsonString = JSON.stringify(readings);
@@ -272,8 +305,8 @@ void theaterChaseRainbow(int wait) {
   }
 }
 
-void Task1code(void *pvParameters) {
-  Serial.print("Task1 running on core ");
+void Task2code(void *pvParameters) {
+  Serial.print("Task2 running on core ");
   Serial.println(xPortGetCoreID());
 
   for (;;) {
@@ -292,8 +325,8 @@ void Task1code(void *pvParameters) {
   }
 }
 
-void Task2code(void *pvParameters) {
-  Serial.print("Task2 running on core ");
+void Task1code(void *pvParameters) {
+  Serial.print("Task1 running on core ");
   Serial.println(xPortGetCoreID());
 
   for (;;) {
