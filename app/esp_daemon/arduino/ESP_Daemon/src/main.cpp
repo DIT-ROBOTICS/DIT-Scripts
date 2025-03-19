@@ -185,8 +185,8 @@ void initSPIFFS() {
 
 // Initialize WiFi
 void initWiFi() {
-  wifiManager.autoConnect("DIT-2025-11-ESP");
-  if (!MDNS.begin("dit-2025-11-esp")) {
+  wifiManager.autoConnect("DIT-2025-00-ESP");
+  if (!MDNS.begin("dit-2025-00-esp")) {
     Serial.println("Error starting mDNS");
     return;
   }
