@@ -100,10 +100,13 @@ void initROS(void) {
   allocator = rcl_get_default_allocator();
 
   // Initialize rclc_support with default allocator
-  RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
-
+  // RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
+  rcl_init_options_t init_options = rcl_get_zero_initialized_init_options();
+  rcl_init_options_init(&init_options, allocator);
+  rcl_init_options_set_domain_id(&init_options, 100);
+  rclc_support_init_with_options(&support, 0, NULL, &init_options, &allocator);
   // Initialize a ROS node with the name "micro_ros_platformio_node"
-  RCCHECK(rclc_node_init_default(&node, "micro_ros_platformio_node", "", &support));
+  RCCHECK(rclc_node_init_default(&node, "esp32_watchdog", "", &support));
 
   // Initialize a ROS publisher with the name "micro_ros_platformio_node_publisher" to publish Int32 messages
   RCCHECK(rclc_publisher_init_default(
@@ -311,7 +314,7 @@ void Task2code(void *pvParameters) {
 
   for (;;) {
     // Execute pending tasks in the executor. This will handle all ROS communications.
-    RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
+    RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1000)));
     
     voltmeter();
     if (interruptCounter > 0) {
