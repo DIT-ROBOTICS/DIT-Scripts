@@ -27,6 +27,7 @@ services:
       # Mount app resources into container.
       - ./robot_status_br/:/home/ros/robot_status_br/   # ros2 workspace
       - /sys/class:/sys/class:ro                        # for system status monitoring
+      - /dev:/dev                                       # for usb status monitoring
 
       # Mount local timezone into container.
       - /etc/timezone:/etc/timezone:ro
