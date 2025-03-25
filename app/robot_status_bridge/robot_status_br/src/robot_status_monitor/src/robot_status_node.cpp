@@ -29,10 +29,11 @@ std::string hostname = get_valid_hostname();
             {"/robot_status/disk", 60.0},
             {"/robot_status/robot_ip", 5.0},
             {"/robot_status/uptime", 30.0},
-            {"/robot_status/usb/mission", 10.0},
-            {"/robot_status/usb/chassis", 10.0},
-            {"/robot_status/usb/lidar", 10.0},
-            {"/robot_status/usb/esp", 10.0},
+            {"/robot_status/usb/mission", 5.0},
+            {"/robot_status/usb/chassis", 5.0},
+            {"/robot_status/usb/lidar", 5.0},
+            {"/robot_status/usb/esp", 5.0},
+            {"/robot_status/usb/imu", 5.0},
         };
 
         // Set the shell commands for each topic
@@ -65,6 +66,7 @@ std::string hostname = get_valid_hostname();
             {"/robot_status/usb/chassis", {"std_msgs::msg::Bool", "[ -e /dev/chassis ] && echo 1 || echo 0" }},
             {"/robot_status/usb/lidar", {"std_msgs::msg::Bool", "[ -e /dev/lidar ] && echo 1 || echo 0" }},
             {"/robot_status/usb/esp", {"std_msgs::msg::Bool", "[ -e /dev/esp ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/imu", {"std_msgs::msg::Bool", "lsusb | grep -E '06c2:00[3-a][0-f]' > /dev/null && echo 1 || echo 0" }},
         };
 
         // Create publishers and timers based on the data type

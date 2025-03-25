@@ -45,6 +45,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     bash-completion \
     wireless-tools \
+    usbutils \
     ros-humble-rmw-cyclonedds-cpp \
     ros-humble-foxglove-bridge
 
