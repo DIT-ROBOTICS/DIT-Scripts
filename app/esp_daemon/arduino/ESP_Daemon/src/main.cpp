@@ -39,6 +39,23 @@
 #error This example is only available for Arduino framework with serial transport.
 #endif
 
+#include <esp_now.h>
+
+// Must match the receiver structure
+typedef struct struct_message {
+  int sima_start;
+} struct_message;
+
+struct_message myData;
+esp_now_peer_info_t peerInfo;
+uint8_t broadcastAddress[] = {0x94, 0xa9, 0x90, 0x0b, 0x07, 0x00};
+
+// callback when data is sent
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  // Serial.print("\r\nLast Packet Send Status:\t");
+  // Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
+
 // Define ROS2 objects for a publisher, a message, an executor, support objects, an allocator, a node, and a timer
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
@@ -88,6 +105,10 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
 void sima_callback(const void * msgin) {
   const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
   mode = msg->data;
+  myData.sima_start = mode;
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+  if (result == ESP_OK) Serial.println("ESP-NOW Success");
+  else Serial.println("ESP-NOW Error");
 }
 
 void initROS(void) {
@@ -351,6 +372,31 @@ void Task1code(void *pvParameters) {
   }
 }
 
+void initESPNow() {
+  // Set device as a Wi-Fi Station
+  WiFi.mode(WIFI_STA);
+
+  // Init ESP-NOW
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Register for Send CB to get the status of Transmitted packet
+  esp_now_register_send_cb(OnDataSent);
+
+  // Register peer
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
+  
+  // Add peer        
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+}
+
 void setup() {
   //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
   xTaskCreatePinnedToCore(
@@ -387,37 +433,38 @@ void setup() {
 
   // Serial port for debugging purposes
   Serial.begin(115200);
-  initWiFi();
+  // initWiFi();
   initSPIFFS();
   initROS();
+  initESPNow();
 
-  // Web Server Root URL
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/index.html", "text/html");
-  });
+  // // Web Server Root URL
+  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   request->send(SPIFFS, "/index.html", "text/html");
+  // });
 
-  server.serveStatic("/", SPIFFS, "/");
+  // server.serveStatic("/", SPIFFS, "/");
 
-  // Request for the latest sensor readings
-  server.on("/readings", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String json = getSensorReadings();
-    request->send(200, "application/json", json);
-    json = String();
-  });
+  // // Request for the latest sensor readings
+  // server.on("/readings", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   String json = getSensorReadings();
+  //   request->send(200, "application/json", json);
+  //   json = String();
+  // });
 
-  events.onConnect([](AsyncEventSourceClient *client) {
-    if (client->lastId()) {
-      Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-    }
-    // send event with message "hello!", id current millis
-    // and set reconnect delay to 1 second
-    client->send("Test", NULL, millis(), 10000);
-  });
-  server.addHandler(&events);
+  // events.onConnect([](AsyncEventSourceClient *client) {
+  //   if (client->lastId()) {
+  //     Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+  //   }
+  //   // send event with message "hello!", id current millis
+  //   // and set reconnect delay to 1 second
+  //   client->send("Test", NULL, millis(), 10000);
+  // });
+  // server.addHandler(&events);
 
-  // Start server
-  AsyncElegantOTA.begin(&server);  // Start ElegantOTA
-  server.begin();
+  // // Start server
+  // AsyncElegantOTA.begin(&server);  // Start ElegantOTA
+  // server.begin();
 }
 
 void loop() {}

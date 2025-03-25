@@ -21,9 +21,6 @@ services:
       - DISPLAY=${DISPLAY}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-    
-    devices:
-      - "/dev/ttyACM0:/dev/ttyACM0"
 
     volumes:
       - ./entrypoint.sh:/entrypoint.sh
@@ -35,6 +32,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
       # Mount X11 server
       - /tmp/.X11-unix:/tmp/.X11-unix
+      
+      # Direct Rendering Infrastructure
+      - /dev:/dev
 
     entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
     command: ["/bin/bash"]
