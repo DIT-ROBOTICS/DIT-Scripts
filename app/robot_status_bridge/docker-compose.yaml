@@ -37,3 +37,28 @@ services:
 
     entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
     command: ["/bin/bash"]
+  
+  samba:
+    image: dperson/samba
+    container_name: robot-samba
+    restart: unless-stopped
+    ports:
+      - "445:445"
+      
+    environment:
+      - USERID=1001
+      - GROUPID=1001
+
+    volumes:
+      # TO-DO: Change the path to the shared folder
+      # - /home/share:/mount/samba
+      - /home/main/Eurobot-2025-Main/src/bt_app_2025/bt_m_config:/mount/samba
+
+      # Mount local timezone into container.
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+    command: >
+      -u "dit;robotics"
+      -s "dit;/mount/samba;yes;no;no;all;dit"
+      -p
