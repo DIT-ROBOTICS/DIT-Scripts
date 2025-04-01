@@ -10,7 +10,7 @@ cp -r .config/autostart /home/ditrobotics/.config/
 
 # Setup udev rules for USB devices (e.g. esp32|stm32|imu|lidar|vive|touchscreen|...)
 echo "Copying udev rules files to /etc/udev/rules.d/"
-cp -r udev/. /etc/udev/rules.d/.
+cp udev/*.rules /etc/udev/rules.d/
 
 # Reload udev rules
 udevadm control --reload-rules && udevadm trigger

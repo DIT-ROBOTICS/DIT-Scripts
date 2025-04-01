@@ -17,17 +17,23 @@ std::string hostname = get_valid_hostname();
 
         // Set the refresh rate for each topic (seconds)
         topic_refresh_rates_ = {
-            {"/robot_status/battery", 5.0},        
-            {"/robot_status/charging", 10.0},   
-            {"/robot_status/cpu", 1.0},            
-            {"/robot_status/cpu_temp", 1.0},           
-            {"/robot_status/ram", 1.0},            
-            {"/robot_status/wifi_signal", 1.0},   
+            {"/robot_status/battery", 5.0},
+            {"/robot_status/charging", 10.0},
+            {"/robot_status/power", 1.0},
+            {"/robot_status/cpu", 1.0},      
+            {"/robot_status/cpu_temp", 1.0},
+            {"/robot_status/ram", 1.0},
+            {"/robot_status/wifi_signal", 1.0},
             {"/robot_status/wifi_connected", 5.0},
             {"/robot_status/wifi_ssid", 5.0},
             {"/robot_status/disk", 60.0},
             {"/robot_status/robot_ip", 5.0},
-            {"/robot_status/uptime", 30.0}        
+            {"/robot_status/uptime", 30.0},
+            {"/robot_status/usb/mission", 5.0},
+            {"/robot_status/usb/chassis", 5.0},
+            {"/robot_status/usb/lidar", 5.0},
+            {"/robot_status/usb/esp", 5.0},
+            {"/robot_status/usb/imu", 5.0},
         };
 
         // Set the shell commands for each topic
@@ -36,6 +42,8 @@ std::string hostname = get_valid_hostname();
             {"/robot_status/battery", {"std_msgs::msg::Int32", "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || cat /sys/class/power_supply/BAT1/capacity 2>/dev/null" }},
             // Check if BAT0 or BAT1 is charging
             {"/robot_status/charging", {"std_msgs::msg::Bool", "cat /sys/class/power_supply/BAT0/status 2>/dev/null | grep -q 'Charging' || cat /sys/class/power_supply/BAT1/status 2>/dev/null | grep -q 'Charging' && echo 1 || echo 0" }},
+            // Get real-time power consumption in watts
+            {"/robot_status/power", {"std_msgs::msg::Float32", "awk '{getline v < \"/sys/class/power_supply/BAT0/voltage_now\"; printf \"%.1f\", v * $1 / 1000000000000}' /sys/class/power_supply/BAT0/current_now" }},
             // Get CPU usage percentage
             {"/robot_status/cpu", {"std_msgs::msg::Float32", "top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'" }},
             // Get CPU temperature in Celsius
@@ -54,6 +62,11 @@ std::string hostname = get_valid_hostname();
             {"/robot_status/robot_ip", {"std_msgs::msg::String", "hostname -I | awk '{print $1}'" }},
             // Get system uptime in hours
             {"/robot_status/uptime", {"std_msgs::msg::Float32", "awk '{print $1/3600}' /proc/uptime" }},
+            {"/robot_status/usb/mission", {"std_msgs::msg::Bool", "[ -e /dev/mission ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/chassis", {"std_msgs::msg::Bool", "[ -e /dev/chassis ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/lidar", {"std_msgs::msg::Bool", "[ -e /dev/lidar ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/esp", {"std_msgs::msg::Bool", "[ -e /dev/esp ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/imu", {"std_msgs::msg::Bool", "lsusb | grep -E '06c2:00[3-a][0-f]' > /dev/null && echo 1 || echo 0" }},
         };
 
         // Create publishers and timers based on the data type
