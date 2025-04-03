@@ -1,5 +1,5 @@
 /******************************
-  Requirements: 
+  Requirements:
     Adafruit_NeoPixel
     Arduino_JSON
     AsyncElegantOTA-2.2.8
@@ -9,62 +9,66 @@
   [ esp32 v2.0.17 ]
 ******************************/
 
+// ========== Includes ==========
+// Arduino/ESP32 core
 #include <Arduino.h>
-#include <ESPmDNS.h>
 #include <WiFi.h>
-#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
+#include <SPIFFS.h>
+#include <ESPmDNS.h>
+
+// Network and Web
+#include <WiFiManager.h>
 #include <AsyncTCP.h>
-#include <AsyncElegantOTA.h>
 #include <ESPAsyncWebServer.h>
-#include "SPIFFS.h"
+#include <AsyncElegantOTA.h>
 #include <Arduino_JSON.h>
+
+// LED
 #include <Adafruit_NeoPixel.h>
 
-// Micro-ROS 
-#include <micro_ros_platformio.h>
+// ESP-NOW
+#include <esp_now.h>
 
-// Core ROS2 libraries for creating nodes, publishers, and executors
+// micro-ROS
+#include <micro_ros_platformio.h>
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
-
-// Standard ROS2 message types
 #include <std_msgs/msg/int32.h>
 #include <std_msgs/msg/float32.h>
 #include <std_msgs/msg/bool.h>
 
-// Ensure that the transport layer being used is Arduino Serial.
-// If it's not, compilation is stopped and error is printed.
-#if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
-#error This example is only available for Arduino framework with serial transport.
-#endif
+// ========== Defines ==========
+#define LED_PIN       D1
+#define LED_COUNT     30
+#define TIMER_PERIOD_US 1000000
 
-#include <esp_now.h>
+#define RCCHECK(fn)        { rcl_ret_t temp_rc = fn; if ((temp_rc != RCL_RET_OK)) { error_loop(); } }
+#define RCSOFTCHECK(fn)    { rcl_ret_t temp_rc = fn; if ((temp_rc != RCL_RET_OK)) {} }
 
-// Must match the receiver structure
-typedef struct struct_message {
-  int sima_start;
-} struct_message;
+// ========== Global Variables ==========
 
-struct_message myData;
+// LED
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// WiFi / Server
+WiFiManager wifiManager;
+AsyncWebServer server(80);
+AsyncEventSource events("/events");
+
+// ESP-NOW
 esp_now_peer_info_t peerInfo;
-uint8_t broadcastAddress[] = {0x94, 0xa9, 0x90, 0x0b, 0x07, 0x00};
+uint8_t broadcastAddress[] = { 0x94, 0xa9, 0x90, 0x0b, 0x07, 0x00 };
+struct struct_message {
+  int sima_start;
+} myData;
 
-// callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  // Serial.print("\r\nLast Packet Send Status:\t");
-  // Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
-
-// Define ROS2 objects for a publisher, a message, an executor, support objects, an allocator, a node, and a timer
+// micro-ROS
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
 
 rcl_publisher_t float_publisher;
 std_msgs__msg__Float32 float_msg;
-
-rcl_subscription_t bool_subscriber;
-std_msgs__msg__Bool bool_msg;
 
 rcl_subscription_t int_subscriber;
 std_msgs__msg__Int32 int_msg;
@@ -75,190 +79,145 @@ rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
 
-// Infinite error loop function. If something fails, the device will get stuck here
+// Tasks and Timer
+TaskHandle_t Task1;
+TaskHandle_t Task2;
+volatile int interruptCounter = 0;
+hw_timer_t* _timer = NULL;
+portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+
+// Others
+volatile int mode = 0;
+float offset = 0.65;
+uint32_t Vbatt = 0;
+float Vbattf = 0.0;
+
+// ========== Function Prototypes ==========
+void error_loop();
+void timer_callback(rcl_timer_t* timer, int64_t last_call_time);
+void sima_callback(const void* msgin);
+void OnDataSent(const uint8_t* mac_addr, esp_now_send_status_t status);
+
+void initROS();
+void initSPIFFS();
+void initWiFi();
+void initESPNow();
+
+void voltmeter();
+void IRAM_ATTR onTimer();
+
+void colorWipe(uint32_t color, int wait);
+void rainbow(int wait);
+
+void Task1code(void* pvParameters);
+void Task2code(void* pvParameters);
+
+String getSensorReadings();
+
+// ========== Core Functions ==========
+
 void error_loop() {
-  while(1) {
-    delay(100);
-  }
+  while (1) delay(100);
 }
 
-// Macros for checking return of ROS2 functions and entering an infinite error loop in case of error
-#define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
-#define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
-
-float Vbattf = 0.0;
-volatile int mode = 0;
-// This is the function that will be called every time the timer expires
-void timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
+void timer_callback(rcl_timer_t* timer, int64_t last_call_time) {
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
     RCSOFTCHECK(rcl_publish(&publisher, &msg, NULL));
-    // Publish integer message
-    if (rcl_publish(&publisher, &msg, NULL) == RCL_RET_OK) {
-      RCSOFTCHECK(rcl_publish(&float_publisher, &float_msg, NULL));
-    }
+    RCSOFTCHECK(rcl_publish(&float_publisher, &float_msg, NULL));
     msg.data++;
     float_msg.data = Vbattf;
   }
 }
 
-void sima_callback(const void * msgin) {
-  const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
+void sima_callback(const void* msgin) {
+  const std_msgs__msg__Int32* msg = (const std_msgs__msg__Int32*)msgin;
   mode = msg->data;
   myData.sima_start = mode;
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
-  if (result == ESP_OK) Serial.println("ESP-NOW Success");
-  else Serial.println("ESP-NOW Error");
+
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&myData, sizeof(myData));
+  Serial.println(result == ESP_OK ? "ESP-NOW Success" : "ESP-NOW Error");
 }
 
-void initROS(void) {
-  // Configure Micro-ROS library to use Arduino serial
-  set_microros_serial_transports(Serial);
-  // Allow some time for everything to start properly
-  delay(2000);
+void OnDataSent(const uint8_t* mac_addr, esp_now_send_status_t status) {
+  Serial.print("ESP-NOW Send Status: ");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail");
+}
 
-  // Get the default memory allocator provided by rcl
+// ========== Initialization Functions ==========
+
+void initROS() {
+  set_microros_serial_transports(Serial);
+  delay(2000);
   allocator = rcl_get_default_allocator();
 
-  // Initialize rclc_support with default allocator
-  // RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
   rcl_init_options_t init_options = rcl_get_zero_initialized_init_options();
   rcl_init_options_init(&init_options, allocator);
   rcl_init_options_set_domain_id(&init_options, 100);
   rclc_support_init_with_options(&support, 0, NULL, &init_options, &allocator);
-  // Initialize a ROS node with the name "micro_ros_platformio_node"
+
   RCCHECK(rclc_node_init_default(&node, "esp32_watchdog", "", &support));
+  RCCHECK(rclc_publisher_init_default(&publisher, &node,
+           ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32), "esp32_counter"));
+  RCCHECK(rclc_publisher_init_default(&float_publisher, &node,
+           ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32), "/robot_status/battery_voltage"));
 
-  // Initialize a ROS publisher with the name "micro_ros_platformio_node_publisher" to publish Int32 messages
-  RCCHECK(rclc_publisher_init_default(
-    &publisher,
-    &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-    "esp32_counter"));
-
-  // Initialize a ROS publisher for Float32 messages
-  RCCHECK(rclc_publisher_init_default(
-    &float_publisher,
-    &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
-    "/robot_status/battery_voltage"));
-
-  // Initialize a timer with a period of 1 second which calls the function timer_callback() every time it expires
-  const unsigned int timer_timeout = 100;
-  RCCHECK(rclc_timer_init_default(
-    &timer,
-    &support,
-    RCL_MS_TO_NS(timer_timeout),
-    timer_callback));
-
-  // Initialize an executor that will manage the execution of all the ROS entities (publishers, subscribers, services, timers)
+  RCCHECK(rclc_timer_init_default(&timer, &support, RCL_MS_TO_NS(100), timer_callback));
   RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator));
-  // Add our timer to the executor
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
 
-  // // Initialize a ROS subscriber for Bool messages
-  // RCCHECK(rclc_subscription_init_default(
-  //   &bool_subscriber,
-  //   &node,
-  //   ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Bool),
-  //   "/sima/start"));
-
-  // // Add the subscriber to the executor
-  // RCCHECK(rclc_executor_add_subscription(&executor, &bool_subscriber, &bool_msg, &sima_callback, ON_NEW_DATA));
-
-  // Initialize a ROS subscriber for Int32 messages
-  RCCHECK(rclc_subscription_init_default(
-    &int_subscriber,
-    &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-    "/sima/start"));
-
-  // Add the subscriber to the executor
+  RCCHECK(rclc_subscription_init_default(&int_subscriber, &node,
+           ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32), "/sima/start"));
   RCCHECK(rclc_executor_add_subscription(&executor, &int_subscriber, &int_msg, &sima_callback, ON_NEW_DATA));
 
-  // Initialize our message data to 0
   msg.data = 0;
-
-  // Initialize our float message data to 0.0
   float_msg.data = 0.0;
 }
 
-#define LED_PIN   D1
-#define LED_COUNT 30
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-// int mode = 0;
-
-WiFiManager wifiManager;
-
-TaskHandle_t Task1;
-TaskHandle_t Task2;
-
-volatile int interruptCounter;
-hw_timer_t *_timer = NULL;
-portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-
-// Create AsyncWebServer object on port 80
-AsyncWebServer server(80);
-
-// Create an Event Source on /events
-AsyncEventSource events("/events");
-
-// Json Variable to Hold Sensor Readings
-JSONVar readings;
-
-uint32_t Vbatt = 0;
-// float Vbattf = 0.0;
-float offset = 0.65;
-
-// Get Sensor Readings and return JSON object
-String getSensorReadings() {
-  readings["sensor"] = String(Vbattf);
-  readings["GND"] = 0;
-
-  // 17.5V-[LOW]  20.5V-[FULL]
-  if (Vbattf < 3) {
-    readings["batteryStatus"] = "battery_disconnect";
-    // mode = 2;
-  } else if (Vbattf < 17.5) {
-    readings["batteryStatus"] = "low_battery";
-    // mode = 1;
-  } else {
-    readings["batteryStatus"] = "normal";
-    // mode = 0;
-  }
-
-  String jsonString = JSON.stringify(readings);
-  return jsonString;
-}
-
-// Initialize SPIFFS
 void initSPIFFS() {
   if (!SPIFFS.begin()) {
-    Serial.println("An error has occurred while mounting SPIFFS");
+    Serial.println("SPIFFS mount failed");
   } else {
-    Serial.println("SPIFFS mounted successfully");
+    Serial.println("SPIFFS mounted");
   }
 }
 
-// Initialize WiFi
 void initWiFi() {
   wifiManager.autoConnect("DIT-2025-00-ESP");
   if (!MDNS.begin("dit-2025-00-esp")) {
-    Serial.println("Error starting mDNS");
+    Serial.println("mDNS init failed");
     return;
   }
   Serial.println(WiFi.localIP());
 }
 
+void initESPNow() {
+  WiFi.mode(WIFI_STA);
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("ESP-NOW init failed");
+    return;
+  }
+
+  esp_now_register_send_cb(OnDataSent);
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    Serial.println("ESP-NOW peer add failed");
+    return;
+  }
+}
+
+// ========== Sensor/LED Utility ==========
+
 void voltmeter() {
   Vbatt = 0;
   for (int i = 0; i < 64; i++) {
-    Vbatt = Vbatt + analogReadMilliVolts(A0);  // ADC with correction
+    Vbatt += analogReadMilliVolts(A0);
   }
-  Vbattf = 7.81 * Vbatt / 64 / 1000.0 + offset;  // R1 = 1.5M ohm, R2 = 220k ohm
-  if (Vbattf < 3) Vbattf = 0.00;
-  // Serial.print("batteryVoltage:");
-  // Serial.println(Vbattf, 1);
+  Vbattf = 7.81 * Vbatt / 64 / 1000.0 + offset;
+  if (Vbattf < 3) Vbattf = 0.0;
 }
 
 void IRAM_ATTR onTimer() {
@@ -268,78 +227,68 @@ void IRAM_ATTR onTimer() {
 }
 
 void colorWipe(uint32_t color, int wait) {
-  for (int i = 0; i < strip.numPixels(); i++) {  // For each pixel in strip...
-    strip.setPixelColor(i, color);               //  Set pixel's color (in RAM)
-    strip.show();                                //  Update strip to match
-    delay(wait);                                 //  Pause for a moment
-  }
-}
-
-void theaterChase(uint32_t color, int wait) {
-  for (int a = 0; a < 10; a++) {   // Repeat 10 times...
-    for (int b = 0; b < 3; b++) {  //  'b' counts from 0 to 2...
-      strip.clear();               //   Set all pixels in RAM to 0 (off)
-      // 'c' counts up from 'b' to end of strip in steps of 3...
-      for (int c = b; c < strip.numPixels(); c += 3) {
-        strip.setPixelColor(c, color);  // Set pixel 'c' to value 'color'
-      }
-      strip.show();  // Update strip with new contents
-      delay(wait);   // Pause for a moment
-    }
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color);
+    strip.show();
+    delay(wait);
   }
 }
 
 void rainbow(int wait) {
-  // Hue of first pixel runs 5 complete loops through the color wheel.
-  // Color wheel has a range of 65536 but it's OK if we roll over, so
-  // just count from 0 to 5*65536. Adding 256 to firstPixelHue each time
-  // means we'll make 5*65536/256 = 1280 passes through this loop:
   for (long firstPixelHue = 0; firstPixelHue < 5 * 65536; firstPixelHue += 256) {
-    // strip.rainbow() can take a single argument (first pixel hue) or
-    // optionally a few extras: number of rainbow repetitions (default 1),
-    // saturation and value (brightness) (both 0-255, similar to the
-    // ColorHSV() function, default 255), and a true/false flag for whether
-    // to apply gamma correction to provide 'truer' colors (default true).
     strip.rainbow(firstPixelHue);
-    // Above line is equivalent to:
-    // strip.rainbow(firstPixelHue, 1, 255, 255, true);
-    strip.show();  // Update strip with new contents
-    delay(wait);   // Pause for a moment
+    strip.show();
+    delay(wait);
   }
 }
 
-void theaterChaseRainbow(int wait) {
-  int firstPixelHue = 0;           // First pixel starts at red (hue 0)
-  for (int a = 0; a < 30; a++) {   // Repeat 30 times...
-    for (int b = 0; b < 3; b++) {  //  'b' counts from 0 to 2...
-      strip.clear();               //   Set all pixels in RAM to 0 (off)
-      // 'c' counts up from 'b' to end of strip in increments of 3...
-      for (int c = b; c < strip.numPixels(); c += 3) {
-        // hue of pixel 'c' is offset by an amount to make one full
-        // revolution of the color wheel (range 65536) along the length
-        // of the strip (strip.numPixels() steps):
-        int hue = firstPixelHue + c * 65536L / strip.numPixels();
-        uint32_t color = strip.gamma32(strip.ColorHSV(hue));  // hue -> RGB
-        strip.setPixelColor(c, color);                        // Set pixel 'c' to value 'color'
-      }
-      strip.show();                 // Update strip with new contents
-      delay(wait);                  // Pause for a moment
-      firstPixelHue += 65536 / 90;  // One cycle of color wheel over 90 frames
+String getSensorReadings() {
+  JSONVar readings;
+  readings["sensor"] = String(Vbattf);
+  readings["GND"] = 0;
+
+  if (Vbattf < 3) {
+    readings["batteryStatus"] = "battery_disconnect";
+  } else if (Vbattf < 17.5) {
+    readings["batteryStatus"] = "low_battery";
+  } else {
+    readings["batteryStatus"] = "normal";
+  }
+
+  return JSON.stringify(readings);
+}
+
+// ========== Tasks ==========
+
+void Task1code(void* pvParameters) {
+  Serial.print("Task1 running on core ");
+  Serial.println(xPortGetCoreID());
+
+  for (;;) {
+    switch (mode) {
+      case 2:
+        colorWipe(strip.Color(0, 0, 255), 50);
+        colorWipe(strip.Color(0, 0, 0), 50);
+        break;
+      case 1:
+        colorWipe(strip.Color(255, 0, 0), 50);
+        colorWipe(strip.Color(0, 0, 0), 50);
+        break;
+      default:
+        rainbow(1);
     }
   }
 }
 
-void Task2code(void *pvParameters) {
+void Task2code(void* pvParameters) {
   Serial.print("Task2 running on core ");
   Serial.println(xPortGetCoreID());
 
   for (;;) {
-    // Execute pending tasks in the executor. This will handle all ROS communications.
     RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1000)));
-    
     voltmeter();
-    if (interruptCounter > 0) {
 
+    if (interruptCounter > 0) {
       portENTER_CRITICAL(&timerMux);
       interruptCounter--;
       portEXIT_CRITICAL(&timerMux);
@@ -349,122 +298,60 @@ void Task2code(void *pvParameters) {
   }
 }
 
-void Task1code(void *pvParameters) {
-  Serial.print("Task1 running on core ");
-  Serial.println(xPortGetCoreID());
-
-  for (;;) {
-    switch (mode) 
-    {
-      case 2:
-        colorWipe(strip.Color(0, 0, 255), 50);
-        colorWipe(strip.Color(0, 0, 0), 50);
-        break;
-      case 1: 
-        colorWipe(strip.Color(255, 0, 0), 50);
-        colorWipe(strip.Color(0, 0, 0), 50);
-        break;
-      default:
-        rainbow(1);
-    }
-    // theaterChase(strip.Color(255, 0, 0), 50);
-    // theaterChaseRainbow(50);
-  }
-}
-
-void initESPNow() {
-  // Set device as a Wi-Fi Station
-  WiFi.mode(WIFI_STA);
-
-  // Init ESP-NOW
-  if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
-    return;
-  }
-
-  // Register for Send CB to get the status of Transmitted packet
-  esp_now_register_send_cb(OnDataSent);
-
-  // Register peer
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = 0;  
-  peerInfo.encrypt = false;
-  
-  // Add peer        
-  if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
-    return;
-  }
-}
+// ========== Setup and Loop ==========
 
 void setup() {
-  //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
-  xTaskCreatePinnedToCore(
-    Task1code, /* Task function. */
-    "Task1",   /* name of task. */
-    10000,     /* Stack size of task */
-    NULL,      /* parameter of the task */
-    1,         /* priority of the task */
-    &Task1,    /* Task handle to keep track of created task */
-    0);        /* pin task to core 0 */
+  Serial.begin(115200);
+
+  // Start micro-ROS initialization first
+  initROS();
+
+  // Start tasks
+  xTaskCreatePinnedToCore(Task1code, "Task1", 10000, NULL, 1, &Task1, 0);
+  delay(500);
+  xTaskCreatePinnedToCore(Task2code, "Task2", 10000, NULL, 1, &Task2, 1);
   delay(500);
 
-  //create a task that will be executed in the Task2code() function, with priority 1 and executed on core 1
-  xTaskCreatePinnedToCore(
-    Task2code, /* Task function. */
-    "Task2",   /* name of task. */
-    10000,     /* Stack size of task */
-    NULL,      /* parameter of the task */
-    1,         /* priority of the task */
-    &Task2,    /* Task handle to keep track of created task */
-    1);        /* pin task to core 1 */
-  delay(500);
+  // Initialize LED strip
+  strip.begin();
+  strip.show();
+  strip.setBrightness(128);
 
-  strip.begin();            // INITIALIZE NeoPixel strip object (REQUIRED)
-  strip.show();             // Turn OFF all pixels ASAP
-  strip.setBrightness(128); // Set BRIGHTNESS
-
+  // Initialize timer for voltmeter
+  pinMode(A0, INPUT);
   _timer = timerBegin(0, 80, true);
   timerAttachInterrupt(_timer, &onTimer, true);
-  timerAlarmWrite(_timer, 1000000, true);
+  timerAlarmWrite(_timer, TIMER_PERIOD_US, true);
   timerAlarmEnable(_timer);
 
-  pinMode(A0, INPUT);  // ADC
-
-  // Serial port for debugging purposes
-  Serial.begin(115200);
-  // initWiFi();
+  // Attempt to initialize WiFi and related services
+  initWiFi();
   initSPIFFS();
-  initROS();
   initESPNow();
 
-  // // Web Server Root URL
-  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(SPIFFS, "/index.html", "text/html");
-  // });
+      server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+      request->send(SPIFFS, "/index.html", "text/html");
+    });
 
-  // server.serveStatic("/", SPIFFS, "/");
+    server.serveStatic("/", SPIFFS, "/");
 
-  // // Request for the latest sensor readings
-  // server.on("/readings", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   String json = getSensorReadings();
-  //   request->send(200, "application/json", json);
-  //   json = String();
-  // });
+    server.on("/readings", HTTP_GET, [](AsyncWebServerRequest* request) {
+      String json = getSensorReadings();
+      request->send(200, "application/json", json);
+    });
 
-  // events.onConnect([](AsyncEventSourceClient *client) {
-  //   if (client->lastId()) {
-  //     Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-  //   }
-  //   // send event with message "hello!", id current millis
-  //   // and set reconnect delay to 1 second
-  //   client->send("Test", NULL, millis(), 10000);
-  // });
-  // server.addHandler(&events);
+    events.onConnect([](AsyncEventSourceClient* client) {
+      if (client->lastId()) {
+        Serial.printf("Client reconnected! Last ID: %u\n", client->lastId());
+      }
+      client->send("Test", NULL, millis(), 10000);
+    });
 
-  // // Start server
-  // AsyncElegantOTA.begin(&server);  // Start ElegantOTA
-  // server.begin();
+    server.addHandler(&events);
+    AsyncElegantOTA.begin(&server);
+    server.begin();
+  }
+
+void loop() {
+  // Empty loop; tasks run independently
 }
-
-void loop() {}

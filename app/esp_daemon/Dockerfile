@@ -63,6 +63,7 @@ FROM tools AS final
 # Set up the user environment
 ENV TZ=Asia/Taipei
 ENV SHELL=/bin/bash
+ENV TERM=xterm-256color
 USER $USERNAME
 WORKDIR /esp_daemon
 

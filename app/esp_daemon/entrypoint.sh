@@ -7,6 +7,7 @@ cd $WS_DIR
 
 source $WS_DIR/install/setup.bash
 # ros2 run robot_status_monitor robot_status_node
+# ./micro-ROS_install.sh
 
 while true; do
     sleep 60

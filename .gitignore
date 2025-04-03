@@ -9,6 +9,11 @@
 # Ignore python cache files
 **/__pycache__/
 
+# Ignore mirco-ROS files
+**/src/mirco_ros/
+**/src/uros/
+**/ros2.repos
+
 # Other pecific files or directories
 web-ui/data/*
 !data/.gitkeep
