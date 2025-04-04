@@ -9,10 +9,12 @@
 #define BROADCAST_ADDR { 0x94, 0xa9, 0x90, 0x0b, 0x07, 0x00 }
 
 // micro-ROS
-#define ROS_DOMAIN_ID   100
-#define ROS_NODE_NAME   "esp_daemon"
-#define ROS_TIMER_MS    500
-#define RELAY_PIN       D2
+#define ROS_NODE_NAME       "esp_daemon"
+#define ROS_DOMAIN_ID       100
+#define ROS_TIMER_MS        250
+#define MROS_TIMEOUT_MS     100
+#define MROS_PING_INTERVAL  1000
+#define RELAY_PIN           D2
 
 // RGB LED strip 
 #define LED_PIN         D1

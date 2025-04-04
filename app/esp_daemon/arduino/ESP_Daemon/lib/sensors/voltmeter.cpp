@@ -1,4 +1,5 @@
 #include "voltmeter.h"
+#include "ros_node.h"
 #include "config.h"
 #include <Arduino_JSON.h>
 #include <ESPAsyncWebServer.h>
@@ -40,12 +41,16 @@ String getSensorReadings() {
   readings["sensor"] = String(Vbattf);
   readings["GND"] = 0;
 
-  if (Vbattf < 3) {
-    readings["batteryStatus"] = "battery_disconnect";
-  } else if (Vbattf < 17.5) {
-    readings["batteryStatus"] = "low_battery";
-  } else {
-    readings["batteryStatus"] = "normal";
+  if      (Vbattf < 3)    readings["batteryStatus"] = "DISCONNECTED";
+  else if (Vbattf < 17.5) readings["batteryStatus"] = "LOW";
+  else                    readings["batteryStatus"] = "NORMAL";
+
+  switch (state) {
+    case WAITING_AGENT:       readings["microROS"] = "WAITING_AGENT";       break;
+    case AGENT_AVAILABLE:     readings["microROS"] = "AGENT_AVAILABLE";     break;
+    case AGENT_CONNECTED:     readings["microROS"] = "AGENT_CONNECTED";     break;
+    case AGENT_DISCONNECTED:  readings["microROS"] = "AGENT_DISCONNECTED";  break;
+    default:                  readings["microROS"] = "UNKNOWN";             break;
   }
 
   return JSON.stringify(readings);

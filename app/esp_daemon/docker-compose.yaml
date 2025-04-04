@@ -37,5 +37,7 @@ services:
       # Direct Rendering Infrastructure
       - /dev:/dev
 
+    stop_grace_period: 1s
+
     entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
     command: ["/bin/bash"]
