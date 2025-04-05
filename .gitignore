@@ -10,7 +10,7 @@
 **/__pycache__/
 
 # Ignore mirco-ROS files
-**/src/mirco_ros/
+**/src/micro_ros/
 **/src/uros/
 **/ros2.repos
 
