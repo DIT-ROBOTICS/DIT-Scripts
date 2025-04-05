@@ -17,6 +17,10 @@
 # Ignore the PlatformIO directory
 **/.pio/
 
+# Ignore tmp files
+**/tmp/*
+!**/tmp/.gitkeep
+
 # Other pecific files or directories
 web-ui/data/*
 !data/.gitkeep

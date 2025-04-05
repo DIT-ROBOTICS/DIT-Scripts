@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ~/robot_status_br
-. /opt/ros/humble/setup.sh && colcon build --symlink-install --packages-skip micro_ros_msgs
+# . /opt/ros/humble/setup.sh && colcon build --symlink-install --packages-skip micro_ros_msgs
 
 source ~/robot_status_br/install/setup.bash
 # ros2 launch foxglove_bridge foxglove_bridge_launch.xml &

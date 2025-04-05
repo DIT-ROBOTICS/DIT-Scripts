@@ -1,72 +1,82 @@
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/int32.hpp"
+#include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/string.hpp"
-#include <cstdlib>
-#include <string>
-#include <map>
-#include <chrono>
+#include <cstdlib>      // For system commands
+#include <string>       // For string operations
+#include <map>          // For mapping topics to commands
+#include <chrono>       // For time operations
+#include <fstream>      // For file operations
+
+// Temporary file to store battery status
+#define BATTERY_STATUS_FILE "/home/ros/robot_status_br/tmp/battery_status.json"
 
 class RobotStatusPublisher : public rclcpp::Node {
 public:
     RobotStatusPublisher() : Node("robot_status_node") {
-        std::string hostname = get_valid_hostname();
-
         // std::string hostname = get_valid_hostname();
 
         // Set the refresh rate for each topic (seconds)
         topic_refresh_rates_ = {
-            {"/robot_status/battery", 5.0},
-            {"/robot_status/charging", 10.0},
-            {"/robot_status/power", 1.0},
-            {"/robot_status/cpu", 1.0},      
-            {"/robot_status/cpu_temp", 1.0},
-            {"/robot_status/ram", 1.0},
-            {"/robot_status/wifi_signal", 1.0},
+            {"/robot_status/battery",        5.0},
+            {"/robot_status/charging",      10.0},
+            {"/robot_status/power",          1.0},
+            {"/robot_status/cpu",            1.0},      
+            {"/robot_status/cpu_temp",       1.0},
+            {"/robot_status/ram",            1.0},
+            {"/robot_status/wifi_signal",    1.0},
             {"/robot_status/wifi_connected", 5.0},
-            {"/robot_status/wifi_ssid", 5.0},
-            {"/robot_status/disk", 60.0},
-            {"/robot_status/robot_ip", 5.0},
-            {"/robot_status/uptime", 30.0},
-            {"/robot_status/usb/mission", 5.0},
-            {"/robot_status/usb/chassis", 5.0},
-            {"/robot_status/usb/lidar", 5.0},
-            {"/robot_status/usb/esp", 5.0},
-            {"/robot_status/usb/imu", 5.0},
+            {"/robot_status/wifi_ssid",      5.0},
+            {"/robot_status/disk",          60.0},
+            {"/robot_status/robot_ip",       5.0},
+            {"/robot_status/uptime",        30.0},
+            {"/robot_status/usb/mission",    5.0},
+            {"/robot_status/usb/chassis",    5.0},
+            {"/robot_status/usb/lidar",      5.0},
+            {"/robot_status/usb/esp",        5.0},
+            {"/robot_status/usb/imu",        5.0},
         };
 
         // Set the shell commands for each topic
         status_commands_ = {
-            // Get battery percentage from BAT0 or BAT1
-            {"/robot_status/battery", {"std_msgs::msg::Int32", "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || cat /sys/class/power_supply/BAT1/capacity 2>/dev/null" }},
-            // Check if BAT0 or BAT1 is charging
-            {"/robot_status/charging", {"std_msgs::msg::Bool", "cat /sys/class/power_supply/BAT0/status 2>/dev/null | grep -q 'Charging' || cat /sys/class/power_supply/BAT1/status 2>/dev/null | grep -q 'Charging' && echo 1 || echo 0" }},
-            // Get real-time power consumption in watts
-            {"/robot_status/power", {"std_msgs::msg::Float32", "[ -f /sys/class/power_supply/BAT0/current_now ] && awk '{getline v < \"/sys/class/power_supply/BAT0/voltage_now\"; printf \"%.1f\", v * $1 / 1000000000000}' /sys/class/power_supply/BAT0/current_now || echo 0" }},
-            // Get CPU usage percentage
-            {"/robot_status/cpu", {"std_msgs::msg::Float32", "top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'" }},
-            // Get CPU temperature in Celsius
-            {"/robot_status/cpu_temp", {"std_msgs::msg::Float32", "cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{print $1/1000}'" }},
-            // Get RAM usage percentage
-            {"/robot_status/ram", {"std_msgs::msg::Float32", "free | grep Mem | awk '{print ($3/$2) * 100.0}'" }},
-            // Get Wi-Fi signal strength
-            {"/robot_status/wifi_signal", {"std_msgs::msg::Int32", "awk 'NR==3 {print int($3 * 100 / 70)}' /proc/net/wireless" }},
-            // Check if Wi-Fi is connected
-            {"/robot_status/wifi_connected", {"std_msgs::msg::Bool", "cat /sys/class/net/wlp2s0/operstate 2>/dev/null | grep -q 'up' && echo 1 || echo 0" }},
-            // Get Wi-Fi SSID
-            {"/robot_status/wifi_ssid", {"std_msgs::msg::String", "iwgetid -r 2>/dev/null" }},
-            // Get disk usage percentage
-            {"/robot_status/disk", {"std_msgs::msg::Int32", "df --output=pcent / | tail -1 | tr -d '%'" }},
-            // Get robot IP address
-            {"/robot_status/robot_ip", {"std_msgs::msg::String", "hostname -I | awk '{print $1}'" }},
-            // Get system uptime in hours
-            {"/robot_status/uptime", {"std_msgs::msg::Float32", "awk '{print $1/3600}' /proc/uptime" }},
-            {"/robot_status/usb/mission", {"std_msgs::msg::Bool", "[ -e /dev/mission ] && echo 1 || echo 0" }},
-            {"/robot_status/usb/chassis", {"std_msgs::msg::Bool", "[ -e /dev/chassis ] && echo 1 || echo 0" }},
-            {"/robot_status/usb/lidar", {"std_msgs::msg::Bool", "[ -e /dev/lidar ] && echo 1 || echo 0" }},
-            {"/robot_status/usb/esp", {"std_msgs::msg::Bool", "[ -e /dev/esp ] && echo 1 || echo 0" }},
-            {"/robot_status/usb/imu", {"std_msgs::msg::Bool", "lsusb | grep -E '06c2:00[3-a][0-f]' > /dev/null && echo 1 || echo 0" }},
+            /*
+            ================================================================================
+            [ Robot Status Topic List ]
+            --------------------------------------------------------------------------------
+                /robot_status/battery:          Get battery percentage from BAT0 or BAT1
+                /robot_status/charging:         Check if BAT0 or BAT1 is charging 
+                /robot_status/power:            Get real-time power consumption in watts
+                /robot_status/cpu:              Get CPU usage percentage  
+                /robot_status/cpu_temp:         Get CPU temperature in Celsius
+                /robot_status/ram:              Get RAM usage percentage
+                /robot_status/wifi_signal:      Get Wi-Fi signal strength
+                /robot_status/wifi_connected:   Check if Wi-Fi is connected
+                /robot_status/wifi_ssid:        Get Wi-Fi SSID
+                /robot_status/disk:             Get disk usage percentage
+                /robot_status/robot_ip:         Get robot IP address
+                /robot_status/uptime:           Get system uptime in hours
+                /robot_status/usb/              Check if USB devices are connected
+            ================================================================================
+            */
+
+            {"/robot_status/battery",        {"std_msgs::msg::Int32",   "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || cat /sys/class/power_supply/BAT1/capacity 2>/dev/null" }},
+            {"/robot_status/charging",       {"std_msgs::msg::Bool",    "cat /sys/class/power_supply/BAT0/status 2>/dev/null | grep -q 'Charging' || cat /sys/class/power_supply/BAT1/status 2>/dev/null | grep -q 'Charging' && echo 1 || echo 0" }},         
+            {"/robot_status/power",          {"std_msgs::msg::Float32", "[ -f /sys/class/power_supply/BAT0/current_now ] && awk '{getline v < \"/sys/class/power_supply/BAT0/voltage_now\"; printf \"%.1f\", v * $1 / 1000000000000}' /sys/class/power_supply/BAT0/current_now || echo 0" }},
+            {"/robot_status/cpu",            {"std_msgs::msg::Float32", "top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'" }},          
+            {"/robot_status/cpu_temp",       {"std_msgs::msg::Float32", "cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{print $1/1000}'" }},
+            {"/robot_status/ram",            {"std_msgs::msg::Float32", "free | grep Mem | awk '{print ($3/$2) * 100.0}'" }},
+            {"/robot_status/wifi_signal",    {"std_msgs::msg::Int32",   "awk 'NR==3 {print int($3 * 100 / 70)}' /proc/net/wireless" }},
+            {"/robot_status/wifi_connected", {"std_msgs::msg::Bool",    "cat /sys/class/net/wlp2s0/operstate 2>/dev/null | grep -q 'up' && echo 1 || echo 0" }},
+            {"/robot_status/wifi_ssid",      {"std_msgs::msg::String",  "iwgetid -r 2>/dev/null" }},
+            {"/robot_status/disk",           {"std_msgs::msg::Int32",   "df --output=pcent / | tail -1 | tr -d '%'" }},
+            {"/robot_status/robot_ip",       {"std_msgs::msg::String",  "hostname -I | awk '{print $1}'" }},
+            {"/robot_status/uptime",         {"std_msgs::msg::Float32", "awk '{print $1/3600}' /proc/uptime" }},
+            {"/robot_status/usb/mission",    {"std_msgs::msg::Bool",    "[ -e /dev/mission ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/chassis",    {"std_msgs::msg::Bool",    "[ -e /dev/chassis ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/lidar",      {"std_msgs::msg::Bool",    "[ -e /dev/lidar ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/esp",        {"std_msgs::msg::Bool",    "[ -e /dev/esp ] && echo 1 || echo 0" }},
+            {"/robot_status/usb/imu",        {"std_msgs::msg::Bool",    "lsusb | grep -E '06c2:00[3-a][0-f]' > /dev/null && echo 1 || echo 0" }},
         };
 
         // Create publishers and timers based on the data type
@@ -163,6 +173,8 @@ public:
                     }
                 }
             });
+
+        setup_battery_voltage_subscription();
     }
 
 private:
@@ -190,6 +202,8 @@ private:
     std::chrono::steady_clock::time_point last_voltage_update_time;
     rclcpp::TimerBase::SharedPtr battery_timeout_timer;
 
+    const std::string battery_status_file = BATTERY_STATUS_FILE;
+
     void publish_status(const std::string& topic, const CommandInfo& cmd_info) {
         std::string result = execute_command(cmd_info.command);
 
@@ -212,6 +226,16 @@ private:
         }
 
         // RCLCPP_INFO(this->get_logger(), "Published %s: %s", topic.c_str(), result.c_str());
+    }
+
+    void write_battery_status_to_file(float voltage) {
+        std::ofstream file(battery_status_file);
+        if (file.is_open()) {
+            file << "{\"voltage\": " << voltage << "}"; // JSON format
+            file.close();
+        } else {
+            RCLCPP_ERROR(this->get_logger(), "Failed to write battery status to file");
+        }
     }
 
     std::string execute_command(const std::string& command) {
@@ -238,6 +262,20 @@ private:
             [](char c) { return !std::isalnum(c) && c != '_'; }), valid_hostname.end());
         return valid_hostname.empty() ? "unknown_robot" : valid_hostname;
     }
+
+    void handle_battery_voltage(const std_msgs::msg::Float32::SharedPtr msg) {
+        float voltage = msg->data;
+        write_battery_status_to_file(voltage);
+    }
+
+    void setup_battery_voltage_subscription() {
+        battery_voltage_subscription_ = this->create_subscription<std_msgs::msg::Float32>(
+            "/robot_status/battery_voltage", 10,
+            std::bind(&RobotStatusPublisher::handle_battery_voltage, this, std::placeholders::_1)
+        );
+    }
+
+    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr battery_voltage_subscription_;
 };
 
 int main(int argc, char** argv) {
