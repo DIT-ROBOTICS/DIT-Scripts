@@ -118,6 +118,11 @@ function handleResize() {
           statusContainer.style.width = '35%';
           cardGrid.style.width = '60%';
           
+          // Make sure status items container doesn't collapse
+          if (statusItemsContainer) {
+            statusItemsContainer.style.minHeight = '145px'; // Increased from 80px to 145px for better visibility
+          }
+          
           // Get actual content height of status items
           let statusTitle = statusContainer.querySelector('.status-title');
           let statusItemsHeight = 0;
@@ -125,24 +130,33 @@ function handleResize() {
           if (statusItemsContainer) {
             // Calculate the exact space needed by summing all status item heights
             Array.from(statusItemsContainer.children).forEach(item => {
-              statusItemsHeight += item.offsetHeight + parseInt(window.getComputedStyle(item).marginTop) + 
-                                    parseInt(window.getComputedStyle(item).marginBottom);
+              statusItemsHeight += item.offsetHeight + 
+                                  parseInt(window.getComputedStyle(item).marginTop) + 
+                                  parseInt(window.getComputedStyle(item).marginBottom);
             });
             
             // Add additional padding
-            statusItemsHeight += 20;
+            statusItemsHeight = Math.max(145, statusItemsHeight + 40);
           }
           
           // Calculate total height needed for status container
           const titleHeight = statusTitle ? statusTitle.offsetHeight : 0;
           const statusPadding = parseInt(window.getComputedStyle(statusContainer).padding) * 2;
-          const statusContentHeight = titleHeight + statusItemsHeight + statusPadding;
+          const emergencyControls = statusContainer.querySelector('.emergency-controls');
+          const emergencyHeight = emergencyControls ? emergencyControls.offsetHeight : 0;
+          const statusContentHeight = titleHeight + statusItemsHeight + statusPadding + emergencyHeight;
           
           // Set height based on the taller of the two - either content height or match card height
           const cardHeight = cardGrid.offsetHeight;
           
-          // Use content height, but don't exceed card height
-          statusContainer.style.height = Math.min(statusContentHeight, cardHeight) + 'px';
+          // Always use the larger of the two values to ensure content is visible
+          // BUT limit maximum height to prevent excessive height on large screens
+          const maxAllowedHeight = Math.min(600, window.innerHeight * 0.5); // Limit max height to 50% of viewport height or 600px
+          const calculatedHeight = Math.max(statusContentHeight, cardHeight);
+          const finalHeight = Math.min(calculatedHeight, maxAllowedHeight);
+          
+          statusContainer.style.height = finalHeight + 'px';
+          statusContainer.style.minHeight = Math.min(statusContentHeight, maxAllowedHeight) + 'px';
           
           // If status container is shorter, align it to the top
           if (statusContentHeight < cardHeight) {
@@ -159,6 +173,7 @@ function handleResize() {
   }
 }
 
+// Update chart font sizes based on screen width
 function updateChartFontSizes() {
   const baseSize = window.innerWidth >= 2000 ? 14 : 
                   window.innerWidth >= 1600 ? 13 :
@@ -211,9 +226,10 @@ window.addEventListener('load', function() {
   setTimeout(handleResize, 500);
 });
 
+// Configure the Highcharts chart
 var chartT = new Highcharts.Chart({
   chart:{
-    renderTo:'chart-sensor',
+    renderTo: 'chart-sensor',
     backgroundColor: document.documentElement.classList.contains('light-mode') ? '#f0f0f0' : '#1e1e1e',
     reflow: true,
     animation: false,
@@ -311,6 +327,7 @@ var chartT = new Highcharts.Chart({
   }
 });
 
+// Plot data from JSON response
 function plotData(jsonValue) {
   var batteryStatus = jsonValue["batteryStatus"];
   document.getElementById("batteryStatus").innerText = "Battery: " + batteryStatus;
@@ -330,9 +347,7 @@ function plotData(jsonValue) {
     const key = keys[i];
     if (seriesMapping[key] !== undefined) { // Only process valid series keys
       var x = (new Date()).getTime();
-      // console.log(x);
       var y = Number(jsonValue[key]);
-      // console.log(y);
 
       const seriesIndex = seriesMapping[key];
       if (chartT.series[seriesIndex].data.length > 600) {
@@ -344,24 +359,25 @@ function plotData(jsonValue) {
   }
 }
 
-// Function to get current readings on the webpage when it loads for the first time
-function getReadings(){
+// Function to get current readings when the page loads
+function getReadings() {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var myObj = JSON.parse(this.responseText);
       // console.log(myObj);
 
-    var batteryStatus = myObj["batteryStatus"];
-    document.getElementById("batteryStatus").innerText = "Battery: " + batteryStatus;
-    var microROS = myObj["microROS"];
-    document.getElementById("microROS").innerText = "micro-ROS: " + microROS;
+      var batteryStatus = myObj["batteryStatus"];
+      document.getElementById("batteryStatus").innerText = "Battery: " + batteryStatus;
+      var microROS = myObj["microROS"];
+      document.getElementById("microROS").innerText = "micro-ROS: " + microROS;
     }
   };
   xhr.open("GET", "/readings", true);
   xhr.send();
 }
 
+// Setup Server-Sent Events for real-time updates
 if (!!window.EventSource) {
   var source = new EventSource('/events');
 
@@ -387,7 +403,76 @@ if (!!window.EventSource) {
   }, false);
 }
 
-// Ensure chart redraws properly on orientation change (particularly important for mobile)
+// Ensure chart redraws properly on orientation change
 window.addEventListener('orientationchange', function() {
   setTimeout(handleResize, 300);
 });
+
+// Emergency button functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const enableButton = document.getElementById('emergencyEnable');
+  const disableButton = document.getElementById('emergencyDisable');
+  
+  if (enableButton && disableButton) {
+    // Enable emergency button handler
+    enableButton.addEventListener('click', function() {
+      sendEmergencyCommand(true);
+      this.classList.add('active');
+      disableButton.classList.remove('active');
+    });
+    
+    // Disable emergency button handler
+    disableButton.addEventListener('click', function() {
+      sendEmergencyCommand(false);
+      this.classList.add('active');
+      enableButton.classList.remove('active');
+    });
+  }
+});
+
+// Function to send emergency command to the server
+function sendEmergencyCommand(enableEmergency) {
+  // Create XMLHttpRequest object
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/emergency", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  
+  // Set callback function
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          // console.log('Emergency command sent successfully:', data);
+          
+          // Add UI feedback
+          const status = enableEmergency ? 'ENABLED' : 'DISABLED';
+          const statusClass = enableEmergency ? 'emergency-enabled' : 'emergency-disabled';
+          
+          // Create or update status message
+          let statusMsg = document.getElementById('emergencyStatus');
+          if (!statusMsg) {
+            statusMsg = document.createElement('div');
+            statusMsg.id = 'emergencyStatus';
+            statusMsg.className = 'status-item';
+            const statusContainer = document.querySelector('.status-items-container');
+            if (statusContainer) {
+              statusContainer.appendChild(statusMsg);
+            }
+          }
+          
+          // Update status message
+          statusMsg.textContent = 'ROBOT - ' + status;
+          statusMsg.className = 'status-item ' + statusClass;
+        } catch (e) {
+          console.error('Error parsing response:', e);
+        }
+      } else {
+        console.error('Error sending emergency command: Network response was not ok');
+      }
+    }
+  };
+  
+  // Send request
+  xhr.send(JSON.stringify({ emergency: enableEmergency }));
+}
