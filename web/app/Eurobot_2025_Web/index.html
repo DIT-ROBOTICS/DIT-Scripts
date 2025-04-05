@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROS2 Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="aspect-ratio-container">
+        <div class="aspect-ratio-content">
+            <div class="dashboard">
+                <!-- Header -->
+                <div class="header box">
+                    <div class="header-container">
+                        <!-- Status Group -->
+                        <div class="header-group status-group">
+                            <div class="status-wrapper">
+                                <div class="header-item status">
+                                    <div class="status-light" style="background-color: green;"></div>
+                                    <span>Main</span>
+                                </div>
+                                <div class="header-item status">
+                                    <div class="status-light" style="background-color: yellow;"></div>
+                                    <span>Camera</span>
+                                </div>
+                                <div class="header-item status">
+                                    <div class="status-light" style="background-color: red;"></div>
+                                    <span>Navigation</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Group -->
+                        <div class="header-group">
+                            <div class="header-item info">
+                                <span>Battery Status:</span>
+                                <strong>19.7V</strong>
+                            </div>
+                            <div class="header-item button" onclick="toggleDebug()">
+                                Debug Panel: Full
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Map Area -->
+                <div class="map-area box">
+                    <div class="score-container">
+                        <div class="score">
+                            <h1>320</h1>
+                            <p>Estimated Score</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="footer box">
+                    <div class="func-area">
+                        <div class="box">
+                            <h3>Strategy Preview</h3>
+                            <div class="content">
+                                <span class="content-line">Go to zone A</span>
+                                <span class="content-line">Collect the columns</span>
+                                <span class="content-line"></span>
+                            </div>
+                        </div>
+                        <div class="box">
+                            <h3>Mode Change</h3>
+                            <div class="content">
+                                <span class="content-line">Go to zone A</span>
+                                <span class="content-line">Collect the columns</span>
+                                <span class="content-line">Go Home</span>
+                            </div>
+                        </div>
+                        <div class="box">
+                            <h3>Plan Select</h3>
+                            <div class="content">
+                                <span class="content-line">We will</span>
+                                <span class="content-line">went to</span>
+                                <span class="content-line">Paris</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+services:
+  robot-status-bridge:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+        USERNAME: ros
+    image: scx/robot-status-bridge:${ROS_DISTRO}
+    container_name: robot-status-bridge
+    stdin_open: true
+    tty: true
+    privileged: true
+    network_mode: "host"
+    restart: unless-stopped
+
+    working_dir: /home/ros
+
+    environment:
+      - TERM=xterm-256color
+      - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+      # Mount app resources into container.
+      - ./robot_status_br/:/home/ros/robot_status_br/   # ros2 workspace
+      - /sys/class:/sys/class:ro                        # for system status monitoring
+      - /dev:/dev                                       # for usb status monitoring
+
+      # Mount local timezone into container.
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      # Mount X11 server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    
+    stop_grace_period: 1s
+
+    entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
+    command: ["/bin/bash"]
+  
+  samba:
+    image: dperson/samba
+    container_name: robot-samba
+    restart: unless-stopped
+    ports:
+      - "445:445"
+      
+    environment:
+      - USERID=1001
+      - GROUPID=1001
+
+    volumes:
+      # TO-DO: Change the path to the shared folder
+      # - /home/share:/mount/samba
+      - /home/main/Eurobot-2025-Main/src/bt_app_2025/bt_m_config:/mount/samba
+
+      # Mount local timezone into container.
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+    command: >
+      -u "dit;robotics"
+      -s "dit;/mount/samba;yes;no;no;all;dit"
+      -p

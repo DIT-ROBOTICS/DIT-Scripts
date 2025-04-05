@@ -1,4 +1,26 @@
+# Ignore the vscode directory
+**/.vscode/
+
+# Ignore the build directory
+**/build/
+**/install/
+**/log/
+
+# Ignore python cache files
+**/__pycache__/
+
+# Ignore mirco-ROS files
+**/src/micro_ros/
+**/src/uros/
+**/ros2.repos
+
+# Ignore the PlatformIO directory
+**/.pio/
+
+# Ignore tmp files
+**/tmp/*
+!**/tmp/.gitkeep
+
+# Other pecific files or directories
 web-ui/data/*
 !data/.gitkeep
-.arduino/Battery_watchdog/build/*
-.vscode/*

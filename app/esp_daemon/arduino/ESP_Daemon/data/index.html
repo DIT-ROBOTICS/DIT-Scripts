@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html class="dark-mode">
+  <head>
+    <meta charset="UTF-8">
+    <title>DIT Robotics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="highcharts.js"></script>
+  </head>
+  <body>
+    <div class="topnav">
+      <h1>ROBOT STATUS PANEL</h1>
+      <button id="modeToggle" class="mode-toggle">LIGHT MODE</button>
+    </div>
+    <div class="content">
+      <div class="card-grid">
+        <div class="card">
+          <p class="card-title">Battery Status</p>
+          <div id="chart-sensor" class="chart-container"></div>
+        </div>
+      </div>
+      
+      <div class="status-container">
+        <p class="status-title">System Status</p>
+        <div class="status-items-container">
+          <div id="batteryStatus" class="status-item">Battery: unknown</div>
+          <div id="microROS" class="status-item">micro-ROS: unknown</div>
+        </div>
+        
+        <div class="emergency-controls">
+          <p class="emergency-title">Emergency Controls</p>
+          <div class="emergency-buttons">
+            <button id="emergencyEnable" class="emergency-btn enable-btn">ENABLE</button>
+            <button id="emergencyDisable" class="emergency-btn disable-btn">DISABLE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      © 2025 Developed by <a href="https://github.com/SeanChangX" target="_blank">SeanChangX</a>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

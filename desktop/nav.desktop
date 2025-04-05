@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Navigation
+Exec=/bin/bash -c "/home/share/scripts/nav.run"
+Icon=utilities-terminal
+Terminal=true
+Comment=Launch DIT script
+

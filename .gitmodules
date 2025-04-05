@@ -1,0 +1,3 @@
+[submodule "web/lichtblick"]
+	path = web/lichtblick
+	url = https://github.com/Lichtblick-Suite/lichtblick.git

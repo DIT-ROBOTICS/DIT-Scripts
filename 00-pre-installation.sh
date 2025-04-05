@@ -25,7 +25,7 @@ progress_bar() {
 
 # Initialize step and total steps variables
 step=1
-total_steps=10 # Adjust based on the actual number of steps you have
+total_steps=11 # Adjust based on the actual number of steps you have
 
 upgrade_system() {
     echo -e "\033[32mUpdating and upgrading system...\033[0m"
@@ -46,7 +46,7 @@ install_dependencies() {
 		net-tools \
 		iw \
 		lm-sensors \
-		conky \
+		conky-all \
 		tmux \
 		screen \
 		htop \
@@ -55,17 +55,21 @@ install_dependencies() {
 		timeshift \
 		cheese \
 		ffmpeg \
-		jq
+		jq \
+        ncdu \
+        git-lfs
 
 		# net-tools     --- for network configuration
 		# iw            --- for wireless network configuration
 		# lm-sensors    --- for device temperature monitoring
-		# conky         --- for system monitoring panel
+		# conky-all     --- for system monitoring panel (update conky -> conky-all for Ubuntu 24.04)
 		# iperf3        --- for network performance testing
 		# timeshift     --- for system snapshot and restore
 		# cheese        --- for camera testing
 		# ffmpeg        --- for audio and video processing (ex. boot-on sound)
 		# jq            --- for JSON parsing
+        # ncdu          --- for disk usage analysis
+        # git-lfs       --- for git large file storage
 
     sleep 1
     progress_bar $step $total_steps
@@ -73,8 +77,10 @@ install_dependencies() {
 }
 
 # Fix for USB device detection issue
+# |
 # |  Reference: 
 # |  https://askubuntu.com/questions/1403705/dev-ttyusb0-not-present-in-ubuntu-22-04
+# |
 remove_brltty() {    
     echo -e "\033[32mRemoving brltty...\033[0m"
 
@@ -95,7 +101,7 @@ install_docker() {
 
     groupadd docker
     usermod -aG docker ditrobotics
-    newgrp docker # optional
+    # newgrp docker # optional
 
     sleep 1
     progress_bar $step $total_steps
@@ -146,11 +152,14 @@ setup_dit_logger() {
     ((step++))
 }
 
-# Setup touch screen orientation
+# Setup touch screen orientation:
+# |
+# | This is for Eurobot 2024 external usb touch screen, it isn't needed in general.
+# |
 flip_screen() {
     echo -e "\033[32mSetting up touch screen HID layout...\033[0m"
 	
-    read -p "Would you like to rotate touch screen? (y/N): " answer
+    read -p "Would you like to rotate external touch screen? (y/N): " answer
 
     case $answer in
         [Yy]* )
@@ -169,11 +178,21 @@ flip_screen() {
     ((step++))
 }
 
-# Restore firefox user preference
-restore_firefox() {
-    echo -e "\033[32mRestoring firefox user preference...\033[0m"
+# Restore user preference
+restore_user_preference() {
 
-    find /home/ditrobotics/snap/firefox/common/.mozilla/firefox/ -type d -name "*.default" -exec cp -r /home/ditrobotics/DIT-Scripts/.mozilla/firefox/dit_config.default/* {} \;
+    ./15-user_preference.sh all
+
+    sleep 1
+    progress_bar $step $total_steps
+    ((step++))
+}
+
+# Setup system environment
+setup_system_env() {
+    echo -e "\033[32mSetting up system environment...\033[0m"
+
+    ./20-env_setup.sh
 
     sleep 1
     progress_bar $step $total_steps
@@ -195,7 +214,8 @@ for ((i=step; i<=total_steps; i++)); do
         7) create_user;;
         8) setup_dit_logger;;
         9) flip_screen;;
-       10) restore_firefox;;
+       10) restore_user_preference;;
+       11) setup_system_env;;
         *) echo -e "\033[31mInvalid step\033[0m";;
     esac
 done
@@ -211,8 +231,8 @@ REBOOT YOUR SYSTEM!!!
 IF ALL LOOKS GOOD, THEN CHECK THE FOLLOWING ITEM
 
 A) Do your first timeshift
-B) Use Clonezilla backup to external SSD
-C) ...
+B) [ABANDONED] Use Clonezilla backup to external SSD
+C) Install Active Backup for Business (Synology NAS) and backup to NAS
 "
 echo "$MOTD"
 

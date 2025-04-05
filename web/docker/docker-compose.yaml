@@ -1,0 +1,52 @@
+services:
+  foxglove-bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        ROS_DISTRO: ${ROS_DISTRO}
+        USERNAME: user
+    image: scx/foxglove-bridge:${ROS_DISTRO}
+    container_name: foxglove-bridge
+    stdin_open: true
+    tty: true
+    privileged: true
+    network_mode: host
+    restart: always
+
+    working_dir: /home/user
+
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+
+    volumes:
+      - ../app:/home/user/app
+      - ./entrypoint.sh:/entrypoint.sh
+
+      # Mount local timezone into container. ( Readonly )
+      # Reference: https://stackoverflow.com/questions/57607381/how-do-i-change-timezone-in-a-docker-container
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      # Mount X11 server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # Direct Rendering Infrastructure
+      - /dev:/dev
+
+      # Mount Temporary Directory
+      - ../config:/opt/ros/humble/share/teleop_twist_joy/config
+    
+    entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
+    command: ["/bin/bash"]
+  
+  lichtblick:
+    build:
+      context: ../lichtblick
+      dockerfile: Dockerfile
+    image: scx/lichtblick:latest
+    container_name: lichtblick
+    ports:
+      - "8080:8080"
+    restart: always
+    
