@@ -27,4 +27,9 @@ ament_target_dependencies(robot_status_node rclcpp std_msgs)
 
 install(TARGETS robot_status_node DESTINATION lib/${PROJECT_NAME})
 
+# Install launch files
+install(DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch
+)
+
 ament_package()

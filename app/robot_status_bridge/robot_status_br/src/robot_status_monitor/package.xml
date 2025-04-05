@@ -16,5 +16,8 @@
 
   <export>
     <build_type>ament_cmake</build_type>
+    <launch>
+      <launch_file>launch/robot_status.launch</launch_file>
+    </launch>
   </export>
 </package>
