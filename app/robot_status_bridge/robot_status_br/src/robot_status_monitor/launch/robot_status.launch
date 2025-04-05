@@ -1,0 +1,11 @@
+<launch>
+    <!-- Launch the micro-ROS agent with respawn but redirect output to log to prevent blocking -->
+    <node pkg="micro_ros_agent" exec="micro_ros_agent" name="micro_ros_agent" 
+          args="serial --dev /dev/ttyACM0" 
+          output="log" 
+          respawn="true" />
+
+    <!-- Launch robot_status_node -->
+    <node pkg="robot_status_monitor" exec="robot_status_node" name="robot_status_node" 
+          output="screen" />
+</launch>

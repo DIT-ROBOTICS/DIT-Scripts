@@ -11,7 +11,7 @@
 class RobotStatusPublisher : public rclcpp::Node {
 public:
     RobotStatusPublisher() : Node("robot_status_node") {
-std::string hostname = get_valid_hostname();
+        std::string hostname = get_valid_hostname();
 
         // std::string hostname = get_valid_hostname();
 
@@ -43,7 +43,7 @@ std::string hostname = get_valid_hostname();
             // Check if BAT0 or BAT1 is charging
             {"/robot_status/charging", {"std_msgs::msg::Bool", "cat /sys/class/power_supply/BAT0/status 2>/dev/null | grep -q 'Charging' || cat /sys/class/power_supply/BAT1/status 2>/dev/null | grep -q 'Charging' && echo 1 || echo 0" }},
             // Get real-time power consumption in watts
-            {"/robot_status/power", {"std_msgs::msg::Float32", "awk '{getline v < \"/sys/class/power_supply/BAT0/voltage_now\"; printf \"%.1f\", v * $1 / 1000000000000}' /sys/class/power_supply/BAT0/current_now" }},
+            {"/robot_status/power", {"std_msgs::msg::Float32", "[ -f /sys/class/power_supply/BAT0/current_now ] && awk '{getline v < \"/sys/class/power_supply/BAT0/voltage_now\"; printf \"%.1f\", v * $1 / 1000000000000}' /sys/class/power_supply/BAT0/current_now || echo 0" }},
             // Get CPU usage percentage
             {"/robot_status/cpu", {"std_msgs::msg::Float32", "top -bn1 | grep 'Cpu(s)' | awk '{print 100 - $8}'" }},
             // Get CPU temperature in Celsius
@@ -88,6 +88,81 @@ std::string hostname = get_valid_hostname();
                 [this, topic, cmd_info]() { publish_status(topic, cmd_info); }
             );
         }
+
+        // Add a publisher for battery uptime
+        battery_uptime_publisher = this->create_publisher<std_msgs::msg::Float32>("/robot_status/battery_uptime", 10);
+
+        // Subscribe to battery voltage
+        battery_voltage_subscription = this->create_subscription<std_msgs::msg::Float32>(
+            "/robot_status/battery_voltage", 10,
+            [this](const std_msgs::msg::Float32::SharedPtr msg) {
+                auto now = std::chrono::steady_clock::now();
+                last_voltage_update_time = now; // Update last voltage update time
+                
+                if (msg->data > 0.0) {
+                    // If the battery was previously disconnected, reset the uptime when reconnected
+                    if (battery_was_disconnected) {
+                        battery_uptime = 0;
+                        battery_start_time = now;
+                        battery_was_disconnected = false;
+                        // RCLCPP_INFO(this->get_logger(), "Battery reconnected. Uptime reset to 0.");
+                    }
+                    
+                    // If the battery voltage is greater than 0, update the uptime
+                    if (battery_voltage_active) {
+                        // On active tracking, calculate total seconds from the start time
+                        int total_elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+                            now - battery_start_time).count();
+                        
+                        // Update the total uptime
+                        battery_uptime = total_elapsed;
+                        
+                    } else {
+                        // First time tracking or transitioning from inactive to active (but not from disconnected)
+                        if (!battery_was_disconnected) {
+                            battery_start_time = now;
+                            battery_uptime = 0;
+                        }
+                        battery_voltage_active = true;
+                        // RCLCPP_INFO(this->get_logger(), "Battery monitoring activated with voltage: %.2f V", msg->data);
+                    }
+                    last_battery_voltage = msg->data;
+                    
+                    // Publish the battery uptime
+                    auto uptime_msg = std_msgs::msg::Float32();
+                    uptime_msg.data = static_cast<float>(battery_uptime);
+                    battery_uptime_publisher->publish(uptime_msg);
+                } else {
+                    // If the battery voltage is 0, we stop tracking the uptime but keep the last value
+                    if (battery_voltage_active) {
+                        battery_voltage_active = false;
+                        // RCLCPP_INFO(this->get_logger(), "Battery voltage is zero, uptime preserved: %d seconds", battery_uptime);
+                        
+                        // Continue publishing the current uptime without resetting
+                        auto uptime_msg = std_msgs::msg::Float32();
+                        uptime_msg.data = static_cast<float>(battery_uptime);
+                        battery_uptime_publisher->publish(uptime_msg);
+                    }
+                }
+            });
+
+        // Add a timer to check if the battery voltage is still active
+        battery_timeout_timer = this->create_wall_timer(
+            std::chrono::milliseconds(500),     // Check every 500ms
+            [this]() {
+                if (battery_voltage_active) {
+                    auto now = std::chrono::steady_clock::now();
+                    auto elapsed_since_update = std::chrono::duration_cast<std::chrono::seconds>(
+                        now - last_voltage_update_time).count();
+                        
+                    // If no update for 1 second, consider the battery disconnected
+                    if (elapsed_since_update > 1) {
+                        battery_voltage_active = false;
+                        battery_was_disconnected = true;
+                        // RCLCPP_INFO(this->get_logger(), "Battery voltage updates stopped. Last uptime: %d seconds will be preserved.", battery_uptime);
+                    }
+                }
+            });
     }
 
 private:
@@ -103,6 +178,17 @@ private:
     std::map<std::string, rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr> int_publishers_;
     std::map<std::string, rclcpp::Publisher<std_msgs::msg::String>::SharedPtr> string_publishers_;
     std::map<std::string, rclcpp::TimerBase::SharedPtr> timers_;
+
+    rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr battery_uptime_publisher;
+    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr battery_voltage_subscription;
+    
+    int battery_uptime = 0;
+    std::chrono::steady_clock::time_point battery_start_time;
+    bool battery_voltage_active = false;
+    float last_battery_voltage = 0.0;
+    bool battery_was_disconnected = false;
+    std::chrono::steady_clock::time_point last_voltage_update_time;
+    rclcpp::TimerBase::SharedPtr battery_timeout_timer;
 
     void publish_status(const std::string& topic, const CommandInfo& cmd_info) {
         std::string result = execute_command(cmd_info.command);
@@ -125,7 +211,7 @@ private:
             string_publishers_[topic]->publish(msg);
         }
 
-        RCLCPP_INFO(this->get_logger(), "Published %s: %s", topic.c_str(), result.c_str());
+        // RCLCPP_INFO(this->get_logger(), "Published %s: %s", topic.c_str(), result.c_str());
     }
 
     std::string execute_command(const std::string& command) {
