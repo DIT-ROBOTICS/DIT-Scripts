@@ -14,6 +14,9 @@
 **/src/uros/
 **/ros2.repos
 
+# Ignore the PlatformIO directory
+**/.pio/
+
 # Other pecific files or directories
 web-ui/data/*
 !data/.gitkeep
