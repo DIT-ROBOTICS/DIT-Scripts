@@ -1,7 +1,7 @@
 <launch>
     <!-- Launch the micro-ROS agent with respawn but redirect output to log to prevent blocking -->
     <node pkg="micro_ros_agent" exec="micro_ros_agent" name="micro_ros_agent" 
-          args="serial --dev /dev/ttyACM0" 
+          args="serial --dev /dev/esp-daemon" 
           output="log" 
           respawn="true" />
 
