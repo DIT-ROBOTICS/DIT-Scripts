@@ -4,6 +4,8 @@
 #include <ESPmDNS.h>
 #include <Arduino.h>
 
+int wifi_channel = 0;
+
 void initWiFi() {
   WiFiManager wifiManager;
   wifiManager.autoConnect(HOSTNAME);
@@ -15,4 +17,5 @@ void initWiFi() {
   } else {
     Serial.println("mDNS started");
   }
+  wifi_channel = WiFi.channel();
 }

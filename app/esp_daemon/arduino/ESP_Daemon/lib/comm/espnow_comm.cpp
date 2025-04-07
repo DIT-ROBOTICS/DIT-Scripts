@@ -1,5 +1,6 @@
 #include "espnow_comm.h"
 #include "config.h"
+#include "wifi_config.h"
 #include <WiFi.h>
 
 struct_message myData;
@@ -20,7 +21,7 @@ void initESPNow(){
 
   esp_now_register_send_cb(OnDataSent);
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = 0;
+  peerInfo.channel = wifi_channel;
   peerInfo.encrypt = false;
 
   if (esp_now_add_peer(&peerInfo) != ESP_OK) {

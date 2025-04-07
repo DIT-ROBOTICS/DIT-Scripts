@@ -57,10 +57,9 @@ void setup() {
   xTaskCreatePinnedToCore(voltmeterTask, "Sensor Task", 10000, NULL, 1, &Task2, 1);
   xTaskCreatePinnedToCore(microROSTask, "microROS", 10000, NULL, 1, NULL, 1);
 
-  initESPNow();
-  
   initSPIFFS();
   initWiFi();
+  initESPNow();
   initWebServer();
 }
 

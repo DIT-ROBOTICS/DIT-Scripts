@@ -6,12 +6,12 @@
 #define MDNS_NAME       "dit-2025-00-esp"
 
 // ESP-NOW for SIMA communication
-#define BROADCAST_ADDR { 0x94, 0xa9, 0x90, 0x0b, 0x07, 0x00 }
+#define BROADCAST_ADDR { 0x94, 0xa9, 0x90, 0x0b, 0x86, 0xd8 } // [94:a9:90:0b:86:d8]---[03]
 
 // micro-ROS
 #define ROS_NODE_NAME       "esp_daemon"
 #define ROS_DOMAIN_ID       100
-#define ROS_TIMER_MS        250
+#define ROS_TIMER_MS        100
 #define MROS_TIMEOUT_MS     100
 #define MROS_PING_INTERVAL  1000
 #define RELAY_PIN           D2
