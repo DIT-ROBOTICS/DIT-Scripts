@@ -24,10 +24,12 @@
 // Voltmeter - Battery voltage measurement
 // | Formula:
 // |    Vbattf = (VOLTMETER_CALIBRATION * Vbatt / SLIDING_WINDOW_SIZE / 1000.0) + VOLTMETER_OFFSET;
+// |    [ R1 = 1.5M ohm, R2 = 220k ohm ] VC = 7.81 OFFSET = 0.65
+// |    [ R1 = 1.5M ohm, R2 = 200k ohm ] VC = 8.50 OFFSET = 0.65
 // | Note:
 // |    (A0 == D0) on Xiao ESP32C3
 #define VOLTMETER_PIN           A0
-#define VOLTMETER_CALIBRATION   7.81
+#define VOLTMETER_CALIBRATION   8.5
 #define VOLTMETER_OFFSET        0.65
 #define SLIDING_WINDOW_SIZE     64
 #define TIMER_PERIOD_US         1000000
