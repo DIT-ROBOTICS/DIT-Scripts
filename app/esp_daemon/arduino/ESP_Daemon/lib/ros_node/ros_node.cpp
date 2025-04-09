@@ -46,14 +46,13 @@ void sima_callback(const void* msgin) {
   const std_msgs__msg__Int16* incoming = (const std_msgs__msg__Int16*)msgin;
   
   sendESPNow(incoming->data);
-  mode = incoming->data; // For Testing
 }
 
 void emergency_callback(const void* msgin) {
   const std_msgs__msg__Bool* incoming = (const std_msgs__msg__Bool*)msgin;
   
-  if (incoming->data) digitalWrite(RELAY_PIN, HIGH);
-  else                digitalWrite(RELAY_PIN, LOW);
+  if (incoming->data) digitalWrite(RELAY_PIN, ENABLE);
+  else                digitalWrite(RELAY_PIN, DISABLE);
 }
 
 // Free the resources allocated by micro-ROS
@@ -123,7 +122,7 @@ void initROS() {
   set_microros_serial_transports(Serial);
 
   pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW); // Ensure relay is off initially
+  digitalWrite(RELAY_PIN, RELAY_INITIAL_STATE);
   
   sima_command_msg.data = 0;
   counter_msg.data = 0;
