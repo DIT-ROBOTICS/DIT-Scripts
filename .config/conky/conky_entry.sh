@@ -44,8 +44,10 @@ while ! nc -z localhost 8080; do
   sleep 1
 done
 
-# Open Robot UI in Firefox
-firefox --new-instance \
-        "http://${HOSTNAME}-esp.local" \
-        "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765" \
-        &
+# Open Robot UI
+chromium --kiosk \
+    "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765"
+    &
+firefox -P "default" --kiosk \
+    "http://${HOSTNAME}-esp.local" \
+    &
