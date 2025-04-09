@@ -1,18 +1,16 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define ROBOT_ID    00
-
 // WiFi and mDNS
-#define HOSTNAME        "DIT-2025-" #ROBOT_ID "-ESP"
-#define MDNS_NAME       "dit-2025-" #ROBOT_ID "-esp"
+#define HOSTNAME    "DIT-2025-00-ESP"
+#define MDNS_NAME   "dit-2025-00-esp"
 
 // ESP-NOW for SIMA communication
 #define BROADCAST_ADDR { 0x94, 0xa9, 0x90, 0x0b, 0x86, 0xd8 } // [94:a9:90:0b:86:d8]---[03]
 
 // micro-ROS
 #define ROS_NODE_NAME       "esp_daemon"
-#define ROS_DOMAIN_ID       ROBOT_ID
+#define ROS_DOMAIN_ID       00
 #define ROS_TIMER_MS        100
 #define MROS_TIMEOUT_MS     100
 #define MROS_PING_INTERVAL  1000
@@ -26,7 +24,7 @@
 
 // RGB LED strip 
 #define LED_PIN         D1
-#define LED_COUNT       30
+#define LED_COUNT       40
 #define LED_BRIGHTNESS  128
 
 // Voltmeter - Battery voltage measurement
