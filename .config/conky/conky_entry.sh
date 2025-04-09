@@ -46,7 +46,7 @@ done
 
 # Open Robot UI
 chromium --kiosk \
-    "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765"
+    "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765" \
     &
 firefox -P "default" --kiosk \
     "http://${HOSTNAME}-esp.local" \
