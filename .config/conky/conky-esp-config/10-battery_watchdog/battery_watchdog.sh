@@ -11,6 +11,19 @@ DISCONNECTED_SOUND="battery_removed.mp3"
 DISCONNECTED_PLAYED=false
 
 while true; do
+  if [ ! -e "/dev/esp32-daemon" ]; then
+    if [ -f "$BATTERY_STATUS_FILE" ]; then
+      last_modified=$(stat -c %Y "$BATTERY_STATUS_FILE")
+      current_time=$(date +%s)
+      current_content=$(cat "$BATTERY_STATUS_FILE")
+      if (( current_time - last_modified > 3 )) && [ "$current_content" != '{"voltage": 0}' ]; then
+        echo -n '{"voltage": 0}' > "$BATTERY_STATUS_FILE"
+      fi
+    else
+      echo -n '{"voltage": 0}' > "$BATTERY_STATUS_FILE"
+    fi
+  fi
+
   if [ -f "$BATTERY_STATUS_FILE" ]; then
     voltage=$(jq -r '.voltage' "$BATTERY_STATUS_FILE")
 
