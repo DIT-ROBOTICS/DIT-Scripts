@@ -7,7 +7,7 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 volatile int mode = 0;
 volatile int sensor_mode = 0;
 unsigned long last_override_time = 0;
-const unsigned long override_duration = 3000;
+const unsigned long override_duration = LED_OVR_DURATION;
 int current_mode;
 
 void initLED() {
@@ -57,20 +57,21 @@ void rainbow(int wait){
 void colorWipeNonBlocking(uint32_t color, int wait) {
   static int pixelIndex = 0;
   static unsigned long lastUpdate = 0;
-  static bool wipeOn = true; // Track whether the wipe is turning LEDs on or off
+  static bool wipeOn = true;
 
   if (millis() - lastUpdate >= wait) {
+    strip.setBrightness(LED_BRIGHTNESS); // Reset to default brightness
     if (wipeOn) {
-      strip.setPixelColor(pixelIndex, color); // Turn LED on
+      strip.setPixelColor(pixelIndex, color);
     } else {
-      strip.setPixelColor(pixelIndex, 0); // Turn LED off
+      strip.setPixelColor(pixelIndex, 0);
     }
     strip.show();
     pixelIndex++;
 
     if (pixelIndex >= strip.numPixels()) {
-      pixelIndex = 0; // Reset for the next call
-      wipeOn = !wipeOn; // Toggle between on and off
+      pixelIndex = 0;
+      wipeOn = !wipeOn;
     }
     lastUpdate = millis();
   }
@@ -78,33 +79,29 @@ void colorWipeNonBlocking(uint32_t color, int wait) {
 
 void breathingEffectNonBlocking(uint32_t color, int cycles) {
   static int brightness = 0;
-  static int direction = 20; // Increased step size for faster transition
-  static unsigned long lastUpdate = 0;
+  static int direction = 5; // Increased step size for faster transition
   static int cycleCount = 0;
 
-  if (millis() - lastUpdate >= 20) { // Reduced timing for faster effect
-    brightness += direction;
+  brightness += direction;
 
-    if (brightness >= 255 || brightness <= 0) {
-      direction = -direction; // Reverse direction
-      if (brightness <= 0) {
-        cycleCount++;
-        if (cycleCount >= cycles) {
-          cycleCount = 0; // Reset for the next call
-          brightness = 0;
-          direction = 20;
-          return;
-        }
+  if (brightness >= 255 || brightness <= 0) {
+    direction = -direction;
+    if (brightness <= 0) {
+      cycleCount++;
+      if (cycleCount >= cycles) {
+        cycleCount = 0;
+        brightness = 0;
+        direction = 5;
+        return;
       }
     }
-
-    strip.setBrightness(brightness);
-    for (int i = 0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, color);
-    }
-    strip.show();
-    lastUpdate = millis();
   }
+
+  strip.setBrightness(brightness);
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color);
+  }
+  strip.show();
 }
 
 void rainbowNonBlocking(int wait) {
@@ -112,11 +109,12 @@ void rainbowNonBlocking(int wait) {
   static unsigned long lastUpdate = 0;
 
   if (millis() - lastUpdate >= wait) {
+    strip.setBrightness(LED_BRIGHTNESS); // Reset to default brightness
     strip.rainbow(firstPixelHue);
     strip.show();
     firstPixelHue += 256;
     if (firstPixelHue >= 5 * 65536) {
-      firstPixelHue = 0; // Reset for the next call
+      firstPixelHue = 0;
     }
     lastUpdate = millis();
   }

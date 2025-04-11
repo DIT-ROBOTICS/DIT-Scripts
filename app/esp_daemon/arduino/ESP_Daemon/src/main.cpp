@@ -37,7 +37,7 @@ void microROSTask(void* pvParameters) {
       default:
         break;
     }
-    vTaskDelay(5 / portTICK_PERIOD_MS);
+    // vTaskDelay(5 / portTICK_PERIOD_MS);
   }
 }
 

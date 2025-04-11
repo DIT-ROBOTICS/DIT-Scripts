@@ -23,9 +23,10 @@
 #define DISABLE           (!RELAY_ACTIVE_STATE)
 
 // RGB LED strip 
-#define LED_PIN         D1
-#define LED_COUNT       40
-#define LED_BRIGHTNESS  128
+#define LED_PIN             D1
+#define LED_COUNT           40
+#define LED_BRIGHTNESS      128
+#define LED_OVR_DURATION    1000
 
 // Voltmeter - Battery voltage measurement
 // | Formula:
