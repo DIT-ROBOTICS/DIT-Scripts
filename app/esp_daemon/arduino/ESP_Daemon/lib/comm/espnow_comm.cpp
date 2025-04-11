@@ -29,8 +29,8 @@ void initESPNow(){
   }
 }
 
-void sendESPNow(int mode) {
-  myData.sima_start = mode;
+void sendESPNow(int data) {
+  myData.sima_start = data;
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&myData, sizeof(myData));
   Serial.println(result == ESP_OK ? "ESP-NOW Success" : "ESP-NOW Error");
 }

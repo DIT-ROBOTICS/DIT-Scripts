@@ -18,7 +18,7 @@
 // Emergency Button
 #define RELAY_PIN           D2
 #define RELAY_ACTIVE_STATE  LOW
-#define RELAY_INITIAL_STATE HIGH
+#define RELAY_INITIAL_STATE LOW
 #define ENABLE              RELAY_ACTIVE_STATE
 #define DISABLE           (!RELAY_ACTIVE_STATE)
 

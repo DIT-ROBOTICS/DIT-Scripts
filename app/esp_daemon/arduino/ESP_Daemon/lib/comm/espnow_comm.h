@@ -8,6 +8,6 @@ typedef struct {
 } struct_message;
 
 void initESPNow();
-void sendESPNow(int mode);
+void sendESPNow(int data);
 
 #endif

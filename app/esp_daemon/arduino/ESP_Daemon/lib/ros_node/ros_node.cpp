@@ -46,25 +46,28 @@ void sima_callback(const void* msgin) {
   const std_msgs__msg__Int16* incoming = (const std_msgs__msg__Int16*)msgin;
   
   sendESPNow(incoming->data);
+  mode = SIMA_CMD;
+  last_override_time = millis();
 }
 
 void emergency_callback(const void* msgin) {
   const std_msgs__msg__Bool* incoming = (const std_msgs__msg__Bool*)msgin;
   
-  if (incoming->data) digitalWrite(RELAY_PIN, ENABLE);
-  else                digitalWrite(RELAY_PIN, DISABLE);
+  if (incoming->data) { digitalWrite(RELAY_PIN, ENABLE);  mode = EME_ENABLE;  }
+  else                { digitalWrite(RELAY_PIN, DISABLE); mode = EME_DISABLE; }
+  last_override_time = millis();
 }
 
 // Free the resources allocated by micro-ROS
 void destroy_entities() {
-  rmw_context_t * rmw_context = rcl_context_get_rmw_context(&support.context);
-  (void) rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
+    rmw_context_t * rmw_context = rcl_context_get_rmw_context(&support.context);
+    (void) rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
 
-  rcl_timer_fini(&timer);
-  rclc_executor_fini(&executor);
-  rcl_init_options_fini(&init_options);
-  rcl_node_fini(&node);
-  rclc_support_fini(&support);
+    rcl_timer_fini(&timer);
+    rclc_executor_fini(&executor);
+    rcl_init_options_fini(&init_options);
+    rcl_node_fini(&node);
+    rclc_support_fini(&support);
 
   rcl_publisher_fini(&counter_publisher, &node);
   rcl_publisher_fini(&battery_voltage_publisher, &node);
