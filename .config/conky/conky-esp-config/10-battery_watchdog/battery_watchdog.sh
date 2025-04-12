@@ -9,9 +9,11 @@ DISCONNECTED_THRESHOLD=0.0
 LOW_BATTERY_SOUND="warning_low_battery_en_1.mp3"
 DISCONNECTED_SOUND="battery_removed.mp3"
 DISCONNECTED_PLAYED=false
+ESP32_RECONNECTED=true
 
 while true; do
-  if [ ! -e "/dev/esp32-daemon" ]; then
+  if [ ! -L "/dev/esp-daemon" ] || [ ! -e "/dev/esp-daemon" ]; then
+    ESP32_RECONNECTED=false
     if [ -f "$BATTERY_STATUS_FILE" ]; then
       last_modified=$(stat -c %Y "$BATTERY_STATUS_FILE")
       current_time=$(date +%s)
@@ -21,6 +23,12 @@ while true; do
       fi
     else
       echo -n '{"voltage": 0}' > "$BATTERY_STATUS_FILE"
+    fi
+  else
+    if [[ "$ESP32_RECONNECTED" == false ]]; then
+      pkill -f "firefox -P default --kiosk http://${HOSTNAME}-esp.local"
+      (sleep 5 && firefox -P "default" --kiosk "http://${HOSTNAME}-esp.local" &)
+      ESP32_RECONNECTED=true
     fi
   fi
 
