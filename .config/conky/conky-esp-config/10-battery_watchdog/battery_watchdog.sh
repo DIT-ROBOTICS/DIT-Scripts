@@ -10,6 +10,8 @@ LOW_BATTERY_SOUND="warning_low_battery_en_1.mp3"
 DISCONNECTED_SOUND="battery_removed.mp3"
 DISCONNECTED_PLAYED=false
 ESP32_RECONNECTED=true
+LOW_BATTERY_DURATION=30
+low_battery_start_time=0
 
 while true; do
   if [ ! -L "/dev/esp-daemon" ] || [ ! -e "/dev/esp-daemon" ]; then
@@ -47,10 +49,18 @@ while true; do
       DISCONNECTED_PLAYED=false
 
       if (( $(echo "$voltage < $LOW_BATTERY_THRESHOLD" | bc -l) )); then
-        if ! pgrep -x "ffplay" > /dev/null; then
-          # Broadcast low battery warning
-          ffplay -nodisp -autoexit "$LOW_BATTERY_SOUND" > /dev/null 2>&1 &
+        if [ $low_battery_start_time -eq 0 ]; then
+          low_battery_start_time=$(date +%s)
         fi
+        current_time=$(date +%s)
+        if (( current_time - low_battery_start_time >= LOW_BATTERY_DURATION )); then
+          if ! pgrep -x "ffplay" > /dev/null; then
+            # Broadcast low battery warning
+            ffplay -nodisp -autoexit "$LOW_BATTERY_SOUND" > /dev/null 2>&1 &
+          fi
+        fi
+      else
+        low_battery_start_time=0
       fi
     fi
   fi
