@@ -1,6 +1,5 @@
 #include "led_control.h"
 #include "config.h"
-#include <Arduino.h>
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 // use volatile to ensure the variable is updated correctly in ISR
@@ -128,7 +127,11 @@ void LEDTask(void* pvParameters) {
       }
     }
 
-    int current_mode = (mode == -1) ? sensor_mode : mode;
+    if (sensor_mode == BATT_LOW || sensor_mode == BATT_DISCONNECTED) {
+        current_mode = sensor_mode;
+    } else {
+        current_mode = (mode == -1) ? sensor_mode : mode;
+    }
 
     switch (current_mode) {
       case SIMA_CMD:
