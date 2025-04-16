@@ -1,7 +1,10 @@
 #include "espnow_comm.h"
 #include "config.h"
+
 #include "wifi_config.h"
+
 #include <WiFi.h>
+#include <esp_now.h>
 
 struct_message myData;
 uint8_t broadcastAddress[] = BROADCAST_ADDR;
