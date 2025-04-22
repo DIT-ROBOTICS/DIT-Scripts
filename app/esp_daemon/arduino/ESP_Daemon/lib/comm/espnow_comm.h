@@ -7,5 +7,6 @@ typedef struct {
 
 void initESPNow();
 void sendESPNow(int data);
+void sendESPNow(int data, int addressIndex);
 
 #endif

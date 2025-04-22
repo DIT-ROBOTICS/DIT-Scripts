@@ -6,7 +6,14 @@
 #define MDNS_NAME   "dit-2025-00-esp"
 
 // ESP-NOW for SIMA communication
-#define BROADCAST_ADDR { 0x94, 0xa9, 0x90, 0x0b, 0x86, 0xd8 } // [94:a9:90:0b:86:d8]---[03]
+//  [94:a9:90:07:00:78]---[01]
+//  [94:a9:90:06:E6:00]---[02]
+//  [94:a9:90:0b:86:d8]---[03]
+//  [94:a9:90:05:57:d8]---[04]
+#define SIMA_01 { 0x94, 0xa9, 0x90, 0x07, 0x00, 0x78 }
+#define SIMA_02 { 0x94, 0xa9, 0x90, 0x06, 0xe6, 0x00 }
+#define SIMA_03 { 0x94, 0xa9, 0x90, 0x0b, 0x86, 0xd8 }
+#define SIMA_04 { 0x94, 0xa9, 0x90, 0x05, 0x57, 0xd8 }
 
 // micro-ROS
 #define ROS_NODE_NAME       "esp_daemon"
@@ -37,7 +44,7 @@
 // |    (A0 == D0) on Xiao ESP32C3
 #define VOLTMETER_PIN           A0
 #define VOLTMETER_CALIBRATION   8.5
-#define VOLTMETER_OFFSET        0.65
+#define VOLTMETER_OFFSET        0.1
 #define SLIDING_WINDOW_SIZE     64
 #define TIMER_PERIOD_US         1000000
 // constexpr uint32_t TIMER_PERIOD_US = 1000000;
