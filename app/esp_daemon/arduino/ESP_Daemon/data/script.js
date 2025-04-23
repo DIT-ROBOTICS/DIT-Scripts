@@ -412,6 +412,7 @@ window.addEventListener('orientationchange', function() {
 document.addEventListener('DOMContentLoaded', function() {
   const enableButton = document.getElementById('emergencyEnable');
   const disableButton = document.getElementById('emergencyDisable');
+  const actionButton = document.getElementById('actionButton');
   
   if (enableButton && disableButton) {
     // Enable emergency button handler
@@ -427,6 +428,59 @@ document.addEventListener('DOMContentLoaded', function() {
       this.classList.add('active');
       enableButton.classList.remove('active');
     });
+  }
+  
+  // Modern action button with short and long press functionality
+  if (actionButton) {
+    let pressTimer;
+    let longPress = false;
+    
+    // Mouse/touch down event - start timer
+    actionButton.addEventListener('mousedown', startPressTimer);
+    actionButton.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      startPressTimer();
+    });
+    
+    // Mouse/touch up event - if not long press, navigate
+    actionButton.addEventListener('mouseup', handlePressEnd);
+    actionButton.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      handlePressEnd();
+    });
+    
+    // If the user moves away while pressing, cancel the long press
+    actionButton.addEventListener('mouseleave', clearPressTimer);
+    actionButton.addEventListener('touchcancel', clearPressTimer);
+    
+    function startPressTimer() {
+      clearTimeout(pressTimer);
+      longPress = false;
+      
+      // If button is held for 800ms, it's a long press for refresh
+      pressTimer = setTimeout(() => {
+        longPress = true;
+        actionButton.classList.add('loading');
+        
+        // Add a small delay to show the animation
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }, 800);
+    }
+    
+    function clearPressTimer() {
+      clearTimeout(pressTimer);
+    }
+    
+    function handlePressEnd() {
+      clearTimeout(pressTimer);
+      
+      // If it was a short press (not long press), navigate to the specified URL
+      if (!longPress) {
+        window.location.href = 'http://localhost:8080/';
+      }
+    }
   }
 });
 
