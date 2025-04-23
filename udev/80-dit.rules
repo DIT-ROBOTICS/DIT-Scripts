@@ -5,7 +5,7 @@ ACTION=="add", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", ATTRS{serial}=="64:E8:33:B6:57:88", SYMLINK+="esp-daemon", MODE="0666"
 
 # DIT-2025-14
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="a83661c5e014ef118e9175b8bf9df066", SYMLINK+="chassis", MODE="0666"
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="3ca485551115ef11bc2c75b8bf9df066", SYMLINK+="mission", MODE="0666"
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f2849de9b686ef11a45155405fd1dfbf", SYMLINK+="chassis", MODE="0666"
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="bc1fa6a7208eee11a33703028acbdcd8", SYMLINK+="mission", MODE="0666"
 ACTION=="add", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="e8ddfc52f40aee11b2654502f59e3369", SYMLINK+="lidar", MODE="0666"
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", ATTRS{serial}=="64:E8:33:B6:57:88", SYMLINK+="esp-daemon", MODE="0666"
