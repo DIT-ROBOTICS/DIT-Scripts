@@ -44,8 +44,20 @@ void timer_callback(rcl_timer_t* timer, int64_t last_call_time) {
 
 void sima_callback(const void* msgin) {
   const std_msgs__msg__Int16* incoming = (const std_msgs__msg__Int16*)msgin;
+  int data = incoming->data;
   
-  sendESPNow(incoming->data);
+  if (data >= 10) {
+    // Double-digit: tens digit is address index, ones digit is data
+    int addressIndex = data / 10 - 1;
+    int dataToSend = data % 10;
+    sendESPNow(dataToSend, addressIndex);
+  } else {
+    // Single-digit: send to all addresses
+    for (int i = 0; i < 4; i++) {  // Assuming 4 addresses (SIMA_01 to SIMA_04)
+      sendESPNow(data, i);
+    }
+  }
+  
   mode = SIMA_CMD;
   last_override_time = millis();
 }
