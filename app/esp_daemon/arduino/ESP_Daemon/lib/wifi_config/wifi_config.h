@@ -3,4 +3,6 @@
 
 void initWiFi();
 
+extern int wifi_channel;
+
 #endif

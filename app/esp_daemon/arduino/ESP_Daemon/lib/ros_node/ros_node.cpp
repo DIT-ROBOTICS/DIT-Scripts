@@ -44,28 +44,42 @@ void timer_callback(rcl_timer_t* timer, int64_t last_call_time) {
 
 void sima_callback(const void* msgin) {
   const std_msgs__msg__Int16* incoming = (const std_msgs__msg__Int16*)msgin;
+  int data = incoming->data;
   
-  sendESPNow(incoming->data);
-  mode = incoming->data; // For Testing
+  if (data >= 10) {
+    // Double-digit: tens digit is address index, ones digit is data
+    int addressIndex = data / 10 - 1;
+    int dataToSend = data % 10;
+    sendESPNow(dataToSend, addressIndex);
+  } else {
+    // Single-digit: send to all addresses
+    for (int i = 0; i < 4; i++) {  // Assuming 4 addresses (SIMA_01 to SIMA_04)
+      sendESPNow(data, i);
+    }
+  }
+  
+  mode = SIMA_CMD;
+  last_override_time = millis();
 }
 
 void emergency_callback(const void* msgin) {
   const std_msgs__msg__Bool* incoming = (const std_msgs__msg__Bool*)msgin;
   
-  if (incoming->data) digitalWrite(RELAY_PIN, HIGH);
-  else                digitalWrite(RELAY_PIN, LOW);
+  if (incoming->data) { digitalWrite(RELAY_PIN, ENABLE);  mode = EME_ENABLE;  }
+  else                { digitalWrite(RELAY_PIN, DISABLE); mode = EME_DISABLE; }
+  last_override_time = millis();
 }
 
 // Free the resources allocated by micro-ROS
 void destroy_entities() {
-  rmw_context_t * rmw_context = rcl_context_get_rmw_context(&support.context);
-  (void) rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
+    rmw_context_t * rmw_context = rcl_context_get_rmw_context(&support.context);
+    (void) rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
 
-  rcl_timer_fini(&timer);
-  rclc_executor_fini(&executor);
-  rcl_init_options_fini(&init_options);
-  rcl_node_fini(&node);
-  rclc_support_fini(&support);
+    rcl_timer_fini(&timer);
+    rclc_executor_fini(&executor);
+    rcl_init_options_fini(&init_options);
+    rcl_node_fini(&node);
+    rclc_support_fini(&support);
 
   rcl_publisher_fini(&counter_publisher, &node);
   rcl_publisher_fini(&battery_voltage_publisher, &node);
@@ -123,7 +137,7 @@ void initROS() {
   set_microros_serial_transports(Serial);
 
   pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW); // Ensure relay is off initially
+  digitalWrite(RELAY_PIN, RELAY_INITIAL_STATE);
   
   sima_command_msg.data = 0;
   counter_msg.data = 0;

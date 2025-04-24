@@ -28,7 +28,6 @@ void microROSTask(void* pvParameters) {
         EXECUTE_EVERY_N_MS(MROS_PING_INTERVAL, state = (RMW_RET_OK == rmw_uros_ping_agent(MROS_TIMEOUT_MS, 1)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
         if (state == AGENT_CONNECTED) {
           rclc_executor_spin_some(&executor, RCL_MS_TO_NS(ROS_TIMER_MS));
-          // vTaskDelay(10 / portTICK_PERIOD_MS);
         }
         break;
       case AGENT_DISCONNECTED:
@@ -38,6 +37,7 @@ void microROSTask(void* pvParameters) {
       default:
         break;
     }
+    // vTaskDelay(5 / portTICK_PERIOD_MS);
   }
 }
 
@@ -53,14 +53,13 @@ void setup() {
   initLED();
   initVoltmeter();
 
-  xTaskCreatePinnedToCore(LEDTask, "LED Task", 10000, NULL, 1, &Task1, 0);
-  xTaskCreatePinnedToCore(voltmeterTask, "Sensor Task", 10000, NULL, 1, &Task2, 1);
-  xTaskCreatePinnedToCore(microROSTask, "microROS", 10000, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(LEDTask,       "LED Task",    10000, NULL, 1, &Task1, 0);
+  xTaskCreatePinnedToCore(voltmeterTask, "Sensor Task", 10000, NULL, 1, &Task2, 0);
+  xTaskCreatePinnedToCore(microROSTask,  "microROS",    10000, NULL, 1, NULL,   0);
 
-  initESPNow();
-  
   initSPIFFS();
   initWiFi();
+  initESPNow();
   initWebServer();
 }
 

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ESP-Daemon
+Exec=sh -c 'firefox "http://$(hostname | tr '[:upper:]' '[:lower:]')-esp.local"'
+Icon=/home/ditrobotics/DIT-Scripts/dit/ESP-Daemon.png
+Terminal=false
+Comment=Launch DIT script
+

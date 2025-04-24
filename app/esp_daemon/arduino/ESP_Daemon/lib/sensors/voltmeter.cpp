@@ -1,6 +1,9 @@
 #include "voltmeter.h"
-#include "ros_node.h"
 #include "config.h"
+
+#include "ros_node.h"
+#include "led_control.h"
+
 #include <Arduino_JSON.h>
 #include <ESPAsyncWebServer.h>
 
@@ -41,9 +44,9 @@ String getSensorReadings() {
   readings["sensor"] = String(Vbattf);
   readings["GND"] = 0;
 
-  if      (Vbattf < 3)    readings["batteryStatus"] = "DISCONNECTED";
-  else if (Vbattf < 17.5) readings["batteryStatus"] = "LOW";
-  else                    readings["batteryStatus"] = "NORMAL";
+  if      (Vbattf < 3)    { readings["batteryStatus"] = "DISCONNECTED";     sensor_mode = BATT_DISCONNECTED; }
+  else if (Vbattf < 17.5) { readings["batteryStatus"] = "LOW";              sensor_mode = BATT_LOW;          }
+  else                    { readings["batteryStatus"] = "NORMAL";           sensor_mode = DEFAULT_MODE;      }
 
   switch (state) {
     case WAITING_AGENT:       readings["microROS"] = "WAITING_AGENT";       break;
@@ -68,6 +71,6 @@ void voltmeterTask(void* pvParameters) {
       events.send(getSensorReadings().c_str(), "new_readings", millis());
     }
 
-    delay(100);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }

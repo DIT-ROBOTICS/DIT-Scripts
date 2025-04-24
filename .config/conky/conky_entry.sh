@@ -38,10 +38,16 @@ $DIR/conky-esp-config/10-network_watchdog/network_watchdog.sh &
 
 # # Run the Web Pannel essential scripts
 # /home/ditrobotics/DIT-Scripts/web-ui/scripts/aio.sh &
-# # Wait for the web server to start
-# while ! nc -z localhost 5000; do   
-#   sleep 0.1
-# done
-# 
-# # Open Robot UI in Firefox
-# firefox http://localhost:5000 http://${HOSTNAME}-esp.local &
+
+# Wait for the web server to start
+while ! nc -z localhost 8080; do   
+  sleep 1
+done
+
+# Open Robot UI
+chromium --kiosk \
+    "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765" \
+    &
+firefox --new-window -P "default" --kiosk \
+    "http://${HOSTNAME}-esp.local" \
+    &

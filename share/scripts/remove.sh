@@ -9,7 +9,7 @@ tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S docker compose -p localization
 # Remove navigation
 tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S docker compose -p navigation-run -f /home/navigation/Eurobot-2025-machine-ws/src/Eurobot-2025-Navigation2-envs/Navigation2-humble-deploy/docker-compose.yaml down" C-m
 # Remove main
-tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S docker compose -p main-run -f /home/main/Eurobot-2025-Main/docker/docker-compose.yaml down" C-m
+tmux send-keys -t 0 "echo 'ditrobotics' | sudo -S -u main /home/main/Eurobot-2025-Main/main close" C-m
 
 # Attach to the session
 tmux attach-session -d
