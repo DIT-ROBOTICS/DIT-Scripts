@@ -48,7 +48,12 @@ done
 chromium --kiosk \
     "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765" \
     &
-firefox --new-window -P "default" --kiosk \
-    "localhost:3000" \
-    # "http://${HOSTNAME}-esp.local" \
+sleep 1
+google-chrome --kiosk \
+    "http://localhost:3000" \
     &
+sleep 1
+# firefox --new-window -P "default" --kiosk \
+    # "localhost:3000" \
+    # "http://${HOSTNAME}-esp.local" \
+    # &
