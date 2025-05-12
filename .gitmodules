@@ -1,3 +1,6 @@
 [submodule "web/lichtblick"]
 	path = web/lichtblick
 	url = https://github.com/Lichtblick-Suite/lichtblick.git
+[submodule "web/Eurobot-2025-Web"]
+	path = web/Eurobot-2025-Web
+	url = https://github.com/DIT-ROBOTICS/Eurobot-2025-Web
