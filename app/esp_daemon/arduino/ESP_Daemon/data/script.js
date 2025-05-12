@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // If it was a short press (not long press), navigate to the specified URL
       if (!longPress) {
-        window.location.href = 'http://localhost:8080/';
+        window.location.href = 'http://localhost:3000/';
       }
     }
   }
