@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=ESP-Daemon
-Exec=sh -c 'firefox "http://$(hostname | tr '[:upper:]' '[:lower:]')-esp.local"'
+Name=Debug Panel
+Exec=sh -c 'chromium --kiosk "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765"'
 Icon=/home/ditrobotics/DIT-Scripts/dit/ESP-Daemon.png
 Terminal=false
 Comment=Launch DIT script

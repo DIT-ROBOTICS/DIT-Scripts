@@ -48,7 +48,7 @@ done
 chromium --kiosk \
     "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765" \
     &
-sleep 1
+sleep 5
 google-chrome --kiosk \
     "http://localhost:3000" \
     &
