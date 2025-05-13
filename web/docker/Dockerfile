@@ -66,6 +66,7 @@ FROM tools AS final
 
 RUN apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-foxglove-bridge \
+    ros-${ROS_DISTRO}-rosbridge-server \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up the user environment
