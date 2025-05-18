@@ -65,6 +65,7 @@ RUN apt-get update && apt-get dist-upgrade -y \
 FROM tools AS final
 
 RUN apt-get update && apt-get install -y \
+    ros-humble-rmw-cyclonedds-cpp \
     ros-${ROS_DISTRO}-foxglove-bridge \
     ros-${ROS_DISTRO}-rosbridge-server \
     && rm -rf /var/lib/apt/lists/*
