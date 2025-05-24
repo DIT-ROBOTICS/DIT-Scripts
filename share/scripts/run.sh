@@ -1,8 +1,21 @@
 #!/bin/bash
 
+# Function to send stop_scan service to containers
+send_stop_scan_service() {
+    echo "Sending /stop_scan service to running localization containers..."
+    
+    echo "ditrobotics" | sudo -S docker exec localization-2025-dev-ros2 bash -c "source /opt/ros/humble/setup.bash && ros2 service call /stop_scan std_srvs/srv/Empty" 2>/dev/null || echo "Failed to send stop_scan"
+    
+    # Wait a moment for the service to process
+    sleep 1
+}
+
 # Function to clean up all sessions and processes
 cleanup_all() {
     echo "Cleaning up all sessions and processes..."
+    
+    # Send stop_scan service before stopping containers
+    send_stop_scan_service
     
     # Kill existing sessions
     tmux kill-session -t eurobot-script-local-yellow 2>/dev/null

@@ -1,9 +1,22 @@
 #!/bin/bash
 # Combined localization script for both blue and yellow teams
 
+# Function to send stop_scan service to containers
+send_stop_scan_service() {
+    echo "Sending /stop_scan service to running localization containers..."
+    
+    echo "ditrobotics" | sudo -S docker exec localization-2025-dev-ros2 bash -c "source /opt/ros/humble/setup.bash && ros2 service call /stop_scan std_srvs/srv/Empty" 2>/dev/null || echo "Failed to send stop_scan"
+    
+    # Wait a moment for the service to process
+    sleep 1
+}
+
 # Function to clean up all sessions and processes
 cleanup_all() {
     echo "Cleaning up all sessions and processes..."
+    
+    # Send stop_scan service before stopping containers
+    send_stop_scan_service
     
     # Kill existing sessions
     tmux kill-session -t eurobot-local-session 2>/dev/null
@@ -14,8 +27,8 @@ cleanup_all() {
     echo "ditrobotics" | sudo -S docker compose -p localization-yellow -f /home/localization/Eurobot-2025-Localization/docker/testBot/OdomComm/docker/yellow-compose.yml down 2>/dev/null
     
     # Stop any remaining containers related to our application
-    BLUE_CONTAINERS=$(sudo docker ps -q --filter "name=localization-blue")
-    YELLOW_CONTAINERS=$(sudo docker ps -q --filter "name=localization-yellow")
+    BLUE_CONTAINERS=$(echo "ditrobotics" | sudo -S docker ps -q --filter "name=localization-blue" 2>/dev/null)
+    YELLOW_CONTAINERS=$(echo "ditrobotics" | sudo -S docker ps -q --filter "name=localization-yellow" 2>/dev/null)
     
     if [ -n "$BLUE_CONTAINERS" ] || [ -n "$YELLOW_CONTAINERS" ]; then
         echo "Stopping remaining containers..."
