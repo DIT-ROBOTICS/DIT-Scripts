@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=NAV STOP
-Exec=/bin/bash -c "/home/share/scripts/rm-nav.sh"
-Icon=/home/ditrobotics/DIT-Scripts/dit/trash.png
-Terminal=true
-Comment=Launch DIT script
-

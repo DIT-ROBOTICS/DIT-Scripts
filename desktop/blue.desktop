@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Blue
-Exec=/bin/bash -c "/home/share/scripts/blue.run"
-Icon=utilities-terminal
-Terminal=true
-Comment=Launch DIT script
-

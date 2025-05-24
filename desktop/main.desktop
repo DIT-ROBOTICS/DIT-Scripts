@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=Main
-Exec=/bin/bash -c "/home/share/scripts/main.run"
-Icon=utilities-terminal
+Name=Main Program
+Exec=/bin/bash -c "/home/share/scripts/main.sh"
+Icon=/home/ditrobotics/DIT-Scripts/dit/icon/robot-confused.png
 Terminal=true
-Comment=Launch DIT script
+Comment=Launch Main Program
 

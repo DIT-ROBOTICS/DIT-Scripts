@@ -41,6 +41,7 @@ restore_desktop() {
    # Ensure the share folder is accessible for every user in the docker group
    chgrp -R docker /home/share
    chmod -R g+rw /home/share
+   chmod -R 666 /home/share/data/*
 }
 
 # Restore plymouth theme configuration

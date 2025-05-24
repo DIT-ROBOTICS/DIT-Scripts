@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Navigation
-Exec=/bin/bash -c "/home/share/scripts/nav.run"
-Icon=utilities-terminal
+Exec=/bin/bash -c "/home/share/scripts/nav.sh"
+Icon=/home/ditrobotics/DIT-Scripts/dit/icon/navigation.png
 Terminal=true
-Comment=Launch DIT script
+Comment=Launch Navigation System
 

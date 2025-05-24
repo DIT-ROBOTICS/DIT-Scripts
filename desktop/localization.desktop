@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Localization
+Exec=/bin/bash -c "/home/share/scripts/localization.sh"
+Icon=/home/ditrobotics/DIT-Scripts/dit/icon/radar.png
+Terminal=true
+Comment=Launch Localization System (Auto-select Blue/Yellow)
