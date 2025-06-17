@@ -28,8 +28,8 @@ while true; do
     fi
   else
     if [[ "$ESP32_RECONNECTED" == false ]]; then
-      pkill -f "firefox --new-window -P default --kiosk http://${HOSTNAME}-esp.local"
-      (sleep 5 && firefox --new-window -P "default" --kiosk "http://${HOSTNAME}-esp.local" &)
+      # pkill -f "firefox --new-window -P default --kiosk http://${HOSTNAME}-esp.local"
+      # (sleep 5 && firefox --new-window -P "default" --kiosk "http://${HOSTNAME}-esp.local" &)
       ESP32_RECONNECTED=true
     fi
   fi

@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=DIT Launcher
-Exec=sh -c 'firefox "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765"'
+Name=DIT X
+Exec=sh -c 'google-chrome --kiosk "http://localhost:3000"'
 Icon=/home/ditrobotics/DIT-Scripts/dit/DIT_logo.png
 Terminal=false
 Comment=Launch DIT script

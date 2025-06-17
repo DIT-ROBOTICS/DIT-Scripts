@@ -18,8 +18,10 @@ services:
     working_dir: /home/user
 
     environment:
+      - TERM=xterm-256color
       - DISPLAY=${DISPLAY}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
     volumes:
       - ../app:/home/user/app
@@ -39,6 +41,12 @@ services:
     
     entrypoint: ["/bin/bash", "-c", "/entrypoint.sh"]
     command: ["/bin/bash"]
+    healthcheck:
+      test: ["CMD-SHELL", "(curl -s http://localhost:9090 > /dev/null && netstat -tulpn | grep -q ':8765') || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
   
   lichtblick:
     build:
@@ -49,4 +57,10 @@ services:
     ports:
       - "8080:8080"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -tulpn | grep -q ':8080' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     

@@ -37,6 +37,11 @@ restore_desktop() {
       mkdir -p /home/share/data/
    fi
    cp -r "$DIT_HOME/DIT-Scripts/share/data/"* /home/share/data/
+
+   # Ensure the share folder is accessible for every user in the docker group
+   chgrp -R docker /home/share
+   chmod -R g+rw /home/share
+   chmod -R 666 /home/share/data/*
 }
 
 # Restore plymouth theme configuration
