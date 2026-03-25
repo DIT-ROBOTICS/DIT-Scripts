@@ -3,7 +3,7 @@ ACTION=="add", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=
 
 # DIT-2026-11
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="8aaea649ce9df011a741fb92bb936ffa", SYMLINK+="chassis", MODE="0666"
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="5e3e69964e58ed11b736961b5820eef3", SYMLINK+="mission", MODE="0666"
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="343f87d694f7f011bf802112364a576b", SYMLINK+="mission", MODE="0666"
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", ATTRS{serial}=="64:E8:33:B6:57:88", SYMLINK+="esp-daemon", MODE="0666"
 
 # DIT-2026-13
