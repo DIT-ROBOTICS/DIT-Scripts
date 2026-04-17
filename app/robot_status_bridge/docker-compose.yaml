@@ -55,7 +55,7 @@ services:
     volumes:
       # TO-DO: Change the path to the shared folder
       # - /home/share:/mount/samba
-      - /home/main/Eurobot-2025-Main/src/bt_app_2025/bt_m_config:/mount/samba
+      # - /home/main/Eurobot-2025-Main/src/bt_app_2025/bt_m_config:/mount/samba
 
       # Mount local timezone into container.
       - /etc/timezone:/etc/timezone:ro

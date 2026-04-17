@@ -1,4 +1,4 @@
-
+# Lidar
 ACTION=="add", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0001", SYMLINK+="lidar", MODE="0666"
 
 # DIT-2026-11
@@ -10,4 +10,3 @@ ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="100
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="9e48c398e19df01182bcf192bb936ffa", SYMLINK+="chassis", MODE="0666"
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="a003fc378158ed1180a5991b5820eef3", SYMLINK+="mission", MODE="0666"
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", ATTRS{serial}=="98:3D:AE:AB:5F:34", SYMLINK+="esp-daemon", MODE="0666"
-
