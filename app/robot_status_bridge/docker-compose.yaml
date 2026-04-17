@@ -7,7 +7,7 @@ services:
       args:
         ROS_DISTRO: ${ROS_DISTRO}
         USERNAME: ros
-    image: scx/robot-status-bridge:${ROS_DISTRO}
+    image: seanchangx/robot-status-bridge:${ROS_DISTRO}
     container_name: robot-status-bridge
     stdin_open: true
     tty: true
