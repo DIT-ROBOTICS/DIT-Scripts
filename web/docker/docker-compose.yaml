@@ -26,6 +26,7 @@ services:
     volumes:
       - ../app:/home/user/app
       - ./entrypoint.sh:/entrypoint.sh
+      - ./rosbridge_globs.yaml:/rosbridge_globs.yaml:ro
 
       # Mount local timezone into container. ( Readonly )
       # Reference: https://stackoverflow.com/questions/57607381/how-do-i-change-timezone-in-a-docker-container
