@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Debug Panel
-Exec=sh -c 'chromium --kiosk "http://localhost:3000"'
+Exec=sh -c 'google-chrome --kiosk "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765"'
 Icon=/home/ditrobotics/DIT-Scripts/dit/ESP-Daemon.png
 Terminal=false
 Comment=Launch DIT script
