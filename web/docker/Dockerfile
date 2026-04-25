@@ -63,12 +63,21 @@ RUN apt-get update && apt-get dist-upgrade -y \
 ######################################################################
 
 FROM tools AS final
+ARG ROS_DISTRO
 
 RUN apt-get update && apt-get install -y \
-    ros-humble-rmw-cyclonedds-cpp \
+    python3-colcon-common-extensions \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     ros-${ROS_DISTRO}-foxglove-bridge \
     ros-${ROS_DISTRO}-rosbridge-server \
     && rm -rf /var/lib/apt/lists/*
+
+COPY ros_ws/src/btcpp_ros2_interfaces /tmp/ros_ws/src/btcpp_ros2_interfaces
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh \
+    && cd /tmp/ros_ws \
+    && colcon build --merge-install --packages-select btcpp_ros2_interfaces \
+    && mv /tmp/ros_ws/install /opt/web-bridge-ros-overlay \
+    && rm -rf /tmp/ros_ws
 
 # Set up the user environment
 ENV SHELL /bin/bash

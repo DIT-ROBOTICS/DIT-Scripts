@@ -5,6 +5,7 @@ if [ "$ROS_DISTRO" = 'noetic' ]; then
     roslaunch foxglove_bridge foxglove_bridge.launch;
 elif [ "$ROS_DISTRO" = 'humble' ]; then
     source /opt/ros/humble/setup.bash
+    source /opt/web-bridge-ros-overlay/setup.bash
     ros2 run foxglove_bridge foxglove_bridge --ros-args --params-file /foxglove_whitelist.yaml &
     ros2 run rosbridge_server rosbridge_websocket --ros-args --params-file /rosbridge_whitelist.yaml &
     ros2 run rosapi rosapi_node --ros-args --params-file /rosbridge_whitelist.yaml &

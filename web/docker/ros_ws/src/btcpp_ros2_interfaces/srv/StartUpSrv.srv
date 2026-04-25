@@ -1,0 +1,5 @@
+int32 group
+int32 state
+---
+int32 group
+bool success
