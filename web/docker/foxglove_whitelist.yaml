@@ -1,0 +1,18 @@
+foxglove_bridge:
+  ros__parameters:
+    topic_whitelist:
+      - "^/robot_status/battery_voltage$"
+      - "^/robot_status/usb/.*$"
+      - "^/robot/startup/plug$"
+      - "^/robot/startup/groups_state$"
+      - "^/robot/startup/game_time$"
+      - "^/game_score$"
+      - "^/score$"
+      - "^/robot/startup/ideal_score$"
+      - "^/sima_.*/status$"
+      - "^/robot/on_take$"
+    service_whitelist:
+      - "^/robot/startup/ready_signal$"
+      - "^/robot/startup/web_plan$"
+    client_topic_whitelist:
+      - "(?!)"

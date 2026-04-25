@@ -11,4 +11,3 @@ rosapi:
   ros__parameters:
     topics_glob: "['/robot_status/battery_voltage', '/robot_status/usb/*', '/robot/startup/plug', '/robot/startup/groups_state', '/robot/startup/game_time', '/game_score', '/score', '/robot/startup/ideal_score', '/sima_*/status', '/robot/on_take']"
     services_glob: "['/robot/startup/ready_signal', '/robot/startup/web_plan']"
-    params_glob: "['rival_inscribed_radius', 'dock_rival_radius', 'dock_rival_degree', 'pantry_aggressiveness', 'pantry_sensitivity', 'pantry_rival_sigma', 'pantry_rival_distance_threshold', 'collection_aggressiveness', 'collection_sensitivity', 'collection_rival_sigma', 'collection_rival_distance_threshold', 'flip_distance_threshold', 'cursor_tolerance', 'sima_start_time', 'plan_code']"

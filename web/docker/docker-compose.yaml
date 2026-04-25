@@ -1,5 +1,5 @@
 services:
-  foxglove-bridge:
+  web-bridge:
     build:
       context: .
       dockerfile: Dockerfile
@@ -7,8 +7,8 @@ services:
       args:
         ROS_DISTRO: ${ROS_DISTRO}
         USERNAME: user
-    image: seanchangx/foxglove-bridge:${ROS_DISTRO}
-    container_name: foxglove-bridge
+    image: seanchangx/web-bridge:${ROS_DISTRO}
+    container_name: web-bridge
     stdin_open: true
     tty: true
     privileged: true
@@ -26,7 +26,8 @@ services:
     volumes:
       - ../app:/home/user/app
       - ./entrypoint.sh:/entrypoint.sh
-      - ./rosbridge_globs.yaml:/rosbridge_globs.yaml:ro
+      - ./rosbridge_whitelist.yaml:/rosbridge_whitelist.yaml:ro
+      - ./foxglove_whitelist.yaml:/foxglove_whitelist.yaml:ro
 
       # Mount local timezone into container. ( Readonly )
       # Reference: https://stackoverflow.com/questions/57607381/how-do-i-change-timezone-in-a-docker-container
@@ -64,4 +65,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-    

@@ -5,9 +5,9 @@ if [ "$ROS_DISTRO" = 'noetic' ]; then
     roslaunch foxglove_bridge foxglove_bridge.launch;
 elif [ "$ROS_DISTRO" = 'humble' ]; then
     source /opt/ros/humble/setup.bash
-    ros2 launch foxglove_bridge foxglove_bridge_launch.xml &
-    ros2 run rosbridge_server rosbridge_websocket --ros-args --params-file /rosbridge_globs.yaml &
-    ros2 run rosapi rosapi_node --ros-args --params-file /rosbridge_globs.yaml &
+    ros2 run foxglove_bridge foxglove_bridge --ros-args --params-file /foxglove_whitelist.yaml &
+    ros2 run rosbridge_server rosbridge_websocket --ros-args --params-file /rosbridge_whitelist.yaml &
+    ros2 run rosapi rosapi_node --ros-args --params-file /rosbridge_whitelist.yaml &
     ros2 launch teleop_twist_joy teleop-launch.py joy_config:=xbox joy_vel:=cmd_vel_nav;
     # ros2 run image_tools cam2image --ros-args --log-level WARN -p video_device:=/dev/video0;
 fi
