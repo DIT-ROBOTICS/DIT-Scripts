@@ -12,7 +12,7 @@ foxglove_bridge:
       - "^/sima_.*/status$"
       - "^/robot/on_take$"
     service_whitelist:
-      - "^/robot/startup/ready_signal$"
+      # - "^/robot/startup/ready_signal$"
       - "^/robot/startup/web_plan$"
     client_topic_whitelist:
       - "(?!)"
