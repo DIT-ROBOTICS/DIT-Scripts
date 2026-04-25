@@ -8,5 +8,5 @@ ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="100
 
 # DIT-2026-13
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="9e48c398e19df01182bcf192bb936ffa", SYMLINK+="chassis", MODE="0666"
-ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="2e6a4a56bef7f01196e21612364a576b", SYMLINK+="mission", MODE="0666"
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="10bf8b4f6bf7f0119b3f2012364a576b", SYMLINK+="mission", MODE="0666"
 ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", ATTRS{serial}=="98:3D:AE:AB:5F:34", SYMLINK+="esp-daemon", MODE="0666"
