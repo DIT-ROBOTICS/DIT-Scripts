@@ -9,7 +9,7 @@ foxglove_bridge:
       - "^/score$"
       - "^/robot/startup/ideal_score$"
       - "^/sima_.*/status$"
-      - "^/robot/on_take$"
+      - "^/robot/on_put$"
     service_whitelist:
       # - "^/robot/startup/ready_signal$"
       - "^/robot/startup/web_plan$"
