@@ -50,7 +50,7 @@ chromium --kiosk \
     &
 sleep 5
 google-chrome --kiosk \
-    "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://$(hostname -I | cut -d" " -f1):8765" \
+    "http://localhost:8080/?ds=foxglove-websocket&ds.url=ws://localhost:8765" \
     &
 sleep 1
 # firefox --new-window -P "default" --kiosk \
