@@ -1,6 +1,6 @@
 rosbridge_websocket:
   ros__parameters:
-    topics_glob: "['/robot_status/battery_voltage', '/robot_status/usb/*', '/robot/startup/plug', '/robot/startup/groups_state', '/robot/startup/game_time', '/game_score', '/score', '/robot/startup/ideal_score', '/sima_*/status', '/robot/on_put']"
+    topics_glob: "['/robot_status/battery_voltage', '/robot_status/usb/*', '/robot/startup/plug', '/robot/startup/groups_state', '/robot/startup/game_time', '/game_score', '/score', '/robot/startup/ideal_score', '/sima_001/status', '/sima_002/status', '/sima_003/status', '/sima_004/status', '/sima_011/status', '/sima_012/status', '/sima_013/status', '/sima_014/status', '/sima_ninja_0/status', '/sima_ninja_1/status', '/robot/on_put']"
     services_glob: "['/robot/startup/ready_signal', '/robot/startup/web_plan']"
     actions_glob: "['__blocked__']"
     default_call_service_timeout: 5.0
@@ -9,5 +9,5 @@ rosbridge_websocket:
 
 rosapi:
   ros__parameters:
-    topics_glob: "['/robot_status/battery_voltage', '/robot_status/usb/*', '/robot/startup/plug', '/robot/startup/groups_state', '/robot/startup/game_time', '/game_score', '/score', '/robot/startup/ideal_score', '/sima_*/status', '/robot/on_put']"
+    topics_glob: "['/robot_status/battery_voltage', '/robot_status/usb/*', '/robot/startup/plug', '/robot/startup/groups_state', '/robot/startup/game_time', '/game_score', '/score', '/robot/startup/ideal_score', '/sima_001/status', '/sima_002/status', '/sima_003/status', '/sima_004/status', '/sima_011/status', '/sima_012/status', '/sima_013/status', '/sima_014/status', '/sima_ninja_0/status', '/sima_ninja_1/status', '/robot/on_put']"
     services_glob: "['/robot/startup/ready_signal', '/robot/startup/web_plan']"
